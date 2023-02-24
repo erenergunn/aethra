@@ -1,5 +1,6 @@
 package com.eren.aethra.services.impl;
 
+import com.eren.aethra.daos.ModelDao;
 import com.eren.aethra.utils.JwtTokenUtil;
 import com.eren.aethra.dtos.requests.CustomerRequest;
 import com.eren.aethra.constants.Exceptions;
@@ -21,6 +22,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Resource
     private CustomerDao customerDao;
+
+    @Resource
+    private ModelDao modelDao;
 
     @Resource
     private JwtTokenUtil jwtTokenUtil;
@@ -46,7 +50,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer register(Customer customer) {
-        customerDao.save(customer);
+        modelDao.save(customer);
         return customer;
     }
 
@@ -54,7 +58,7 @@ public class CustomerServiceImpl implements CustomerService {
     public void updateCustomer(CustomerRequest customerDto) throws Exception {
 //        Customer customer = getCustomerWithUid(customerDto.getUid());
         // todo : customer dto dan gelen veriler ile update edilecek.
-//        customerDao.save(customer);
+//        modelDao.save(customer);
     }
 
     @Override

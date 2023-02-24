@@ -4,7 +4,8 @@ import com.eren.aethra.models.Cart;
 
 public interface CartService {
 
-    Cart getCartForCustomer() throws Exception;
+    Cart getCartForCustomer();
+    void validateCart(Cart cart);
     void addProductToCart(String productCode, Integer qty) throws Exception;
     void removeProductFromCart(String productCode) throws Exception;
     void increaseProductQuantity(String productCode) throws Exception;

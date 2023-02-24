@@ -1,15 +1,13 @@
 package com.eren.aethra.services.impl;
 
-import com.eren.aethra.utils.JwtTokenUtil;
 import com.eren.aethra.constants.Exceptions;
-import com.eren.aethra.daos.CartDao;
-import com.eren.aethra.daos.EntryDao;
+import com.eren.aethra.daos.ModelDao;
 import com.eren.aethra.models.Cart;
-import com.eren.aethra.models.Customer;
 import com.eren.aethra.models.Entry;
 import com.eren.aethra.models.Product;
 import com.eren.aethra.services.CartService;
 import com.eren.aethra.services.ProductService;
+import com.eren.aethra.services.SessionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -23,21 +21,30 @@ import java.util.Objects;
 public class CartServiceImpl implements CartService {
 
     @Resource
-    private JwtTokenUtil jwtTokenUtil;
+    private SessionService sessionService;
 
     @Resource
     private ProductService productService;
 
     @Resource
-    private CartDao cartDao;
+    private ModelDao modelDao;
 
-    @Resource
-    private EntryDao entryDao;
 
     @Override
-    public Cart getCartForCustomer() throws Exception {
-        Customer customer = jwtTokenUtil.getUserFromToken();
-        return customer.getCart();
+    public Cart getCartForCustomer() {
+        Cart cart = sessionService.getCurrentCart();
+        validateCart(cart);
+        return cart;
+    }
+
+    @Override
+    public void validateCart(Cart cart) {
+        cart.getEntries().forEach(entry -> {
+            if(entry.getProduct().getStockValue() < entry.getQuantity()) {
+                entry.setQuantity(entry.getProduct().getStockValue());
+                modelDao.save(entry);
+            }
+        });
     }
 
     @Override
@@ -48,10 +55,8 @@ public class CartServiceImpl implements CartService {
             throw new Exception(Exceptions.QUANTITY_OF_THE_PRODUCT_CANT_BE_NEGATIVE + productCode);
         }
         entry.setQuantity(qty);
-        Customer customer = jwtTokenUtil.getUserFromToken();
-        Cart cart;
-        if(Objects.nonNull(customer.getCart())){
-            cart = customer.getCart();
+        Cart cart = sessionService.getCurrentCart();
+        if(Objects.nonNull(cart)){
             List<Entry> entries = CollectionUtils.isNotEmpty(cart.getEntries()) ? cart.getEntries() : new ArrayList<>();
             entries.add(entry);
             cart.setEntries(entries);
@@ -59,21 +64,20 @@ public class CartServiceImpl implements CartService {
             cart = new Cart();
             cart.setEntries(Collections.singletonList(entry));
         }
-        cartDao.save(cart);
+        modelDao.save(cart);
     }
 
     @Override
     public void removeProductFromCart(String productCode) throws Exception {
         Product productModel = productService.findProductByCode(productCode);
-        Customer customer = jwtTokenUtil.getUserFromToken();
-        if(Objects.nonNull(customer.getCart())){
-            Cart cart = customer.getCart();
+        Cart cart = sessionService.getCurrentCart();
+        if(Objects.nonNull(cart)){
             List<Entry> entries = cart.getEntries();
             Entry targetEntry = entries.stream().filter(entry -> entry.getProduct().equals(productModel)).findFirst()
                     .orElseThrow(() -> new Exception(Exceptions.THERE_IS_NO_PRODUCT_TO_REMOVE + productCode));
             entries.remove(targetEntry);
             cart.setEntries(entries);
-            cartDao.save(cart);
+            modelDao.save(cart);
         } else {
             throw new Exception(Exceptions.THERE_IS_NO_PRODUCT_TO_REMOVE);
         }
@@ -82,30 +86,26 @@ public class CartServiceImpl implements CartService {
     @Override
     public void increaseProductQuantity(String productCode) throws Exception {
         Product productModel = productService.findProductByCode(productCode);
-        Customer customer = jwtTokenUtil.getUserFromToken();
-        if(Objects.nonNull(customer.getCart())){
-            Cart cart = customer.getCart();
-            List<Entry> entries = cart.getEntries();
-            Entry targetEntry = entries.stream().filter(entry -> entry.getProduct().equals(productModel)).findFirst()
+        Cart cart = sessionService.getCurrentCart();
+        if(Objects.nonNull(cart)){
+            Entry targetEntry = cart.getEntries().stream().filter(entry -> entry.getProduct().equals(productModel)).findFirst()
                     .orElseThrow(() -> new Exception(Exceptions.THERE_IS_NO_PRODUCT_TO_INCREASE));
             targetEntry.setQuantity(Objects.nonNull(targetEntry.getQuantity()) ? targetEntry.getQuantity() + 1 : 1);
-            entryDao.save(targetEntry);
+            modelDao.save(targetEntry);
         }
     }
 
     @Override
     public void decreaseProductQuantity(String productCode) throws Exception {
         Product productModel = productService.findProductByCode(productCode);
-        Customer customer = jwtTokenUtil.getUserFromToken();
-        if(Objects.nonNull(customer.getCart())){
-            Cart cart = customer.getCart();
-            List<Entry> entries = cart.getEntries();
-            Entry targetEntry = entries.stream().filter(entry -> entry.getProduct().equals(productModel)).findFirst()
+        Cart cart = sessionService.getCurrentCart();
+        if(Objects.nonNull(cart)){
+            Entry targetEntry = cart.getEntries().stream().filter(entry -> entry.getProduct().equals(productModel)).findFirst()
                     .orElseThrow(() -> new Exception(Exceptions.THERE_IS_NO_PRODUCT_TO_INCREASE + productCode));
             if(checkQuantityToDecrease(targetEntry.getQuantity())){
                 targetEntry.setQuantity(targetEntry.getQuantity() - 1);
             }
-            entryDao.save(targetEntry);
+            modelDao.save(targetEntry);
         }
     }
 

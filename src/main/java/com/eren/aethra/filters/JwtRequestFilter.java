@@ -48,7 +48,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             jwtToken = requestTokenHeader.substring(7);
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-                sessionService.setCurrentCustomer(jwtTokenUtil.getUserFromToken());
             } catch (IllegalArgumentException e) {
                 System.out.println("Unable to get JWT Token");
             } catch (ExpiredJwtException  e) {
@@ -73,6 +72,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+                try {
+                    sessionService.setCurrentCustomer(jwtTokenUtil.getUserFromToken());
+                    sessionService.setCurrentCart(sessionService.getCurrentCustomer().getCart());
+                } catch (Exception e) {
+                    System.out.println("Error while creating session");
+                }
             }
         }
         chain.doFilter(request, response);
