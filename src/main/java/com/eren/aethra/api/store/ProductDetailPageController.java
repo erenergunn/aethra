@@ -24,7 +24,7 @@ public class ProductDetailPageController {
     private ModelMapper modelMapper;
 
     @GetMapping("/{productCode}")
-    public ResponseEntity<Object> getProductPageByCode(@PathVariable String productCode){
+    public ResponseEntity getProductPageByCode(@PathVariable String productCode){
         try {
             Product productModel = productService.findProductByCode(productCode);
             return new ResponseEntity<>(modelMapper.map(productModel, ProductResponse.class), HttpStatus.OK);

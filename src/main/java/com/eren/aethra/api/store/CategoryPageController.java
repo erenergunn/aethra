@@ -18,7 +18,7 @@ public class CategoryPageController {
     private CategoryService categoryService;
 
     @GetMapping("/{categoryCode}")
-    public ResponseEntity<Object> getCategoryPageByCode(@PathVariable String categoryCode) {
+    public ResponseEntity getCategoryPageByCode(@PathVariable String categoryCode) {
         try {
             return new ResponseEntity<>(categoryService.getCategoryPage(categoryCode), HttpStatus.OK);
         } catch (Exception e) {

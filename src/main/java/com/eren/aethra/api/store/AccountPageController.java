@@ -27,8 +27,8 @@ public class AccountPageController {
     @Resource
     ModelMapper modelMapper;
 
-    @GetMapping("/edi-profile")
-    public ResponseEntity<Object> editAccount() {
+    @GetMapping("/edit-profile")
+    public ResponseEntity editAccount() {
         try {
             return new ResponseEntity<>(modelMapper.map(customerService.getCurrentCustomer(), CustomerResponse.class), HttpStatus.OK);
         } catch (Exception e) {
@@ -37,7 +37,7 @@ public class AccountPageController {
     }
 
     @PostMapping("/edit-profile")
-    public ResponseEntity<Object> editAccount(@RequestBody CustomerRequest customerDto) {
+    public ResponseEntity editAccount(@RequestBody CustomerRequest customerDto) {
         try {
             customerService.updateCustomer(customerDto);
             return new ResponseEntity<>(AethraCoreConstants.PROFILE_UPDATED_SUCCESSFULLY, HttpStatus.OK);
@@ -47,7 +47,7 @@ public class AccountPageController {
     }
 
     @GetMapping("/addresses")
-    public ResponseEntity<Object> getAddresses() {
+    public ResponseEntity getAddresses() {
         try {
             return new ResponseEntity<>(customerService.getAddressesForCustomer(), HttpStatus.OK);
         } catch (Exception e) {
@@ -56,7 +56,7 @@ public class AccountPageController {
     }
 
     @GetMapping("/edit-address/{addressCode}")
-    public ResponseEntity<Object> editAddress(@PathVariable String addressCode) {
+    public ResponseEntity editAddress(@PathVariable String addressCode) {
         try {
             return new ResponseEntity<>(modelMapper.map(addressService.findAddressByCode(addressCode), AddressResponse.class), HttpStatus.OK);
         } catch (Exception e){
@@ -66,7 +66,7 @@ public class AccountPageController {
 
 
     @PostMapping("/edit-address/{addressCode}")
-    public ResponseEntity<Object> editAddress(@PathVariable String addressCode, @RequestBody AddressRequest addressDto) {
+    public ResponseEntity editAddress(@PathVariable String addressCode, @RequestBody AddressRequest addressDto) {
         try {
             addressService.editAddress(addressCode, addressDto);
             return new ResponseEntity<>(AethraCoreConstants.ADDRESS_UPDATED_SUCCESSFULLY, HttpStatus.OK);

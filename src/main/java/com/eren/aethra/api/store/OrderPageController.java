@@ -25,7 +25,7 @@ public class OrderPageController {
     ModelMapper modelMapper;
 
     @GetMapping
-    public ResponseEntity<Object> getOrdersForCustomer() {
+    public ResponseEntity getOrdersForCustomer() {
         try {
             List<OrderResponse> orderResponses = orderService.getOrdersForCustomer().stream().map(order -> modelMapper.map(order, OrderResponse.class)).collect(Collectors.toList());
             return new ResponseEntity<>(orderResponses, HttpStatus.OK);
@@ -35,7 +35,7 @@ public class OrderPageController {
     }
 
     @GetMapping("/{orderCode}")
-    public ResponseEntity<Object> getOrderByCode(@PathVariable String orderCode) {
+    public ResponseEntity getOrderByCode(@PathVariable String orderCode) {
         try {
             return new ResponseEntity<>(orderService.findOrderDetailsForCode(orderCode), HttpStatus.OK);
         } catch (Exception e) {
