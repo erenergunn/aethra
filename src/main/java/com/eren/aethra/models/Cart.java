@@ -19,4 +19,7 @@ public class Cart extends Item {
 
     private Double totalPrice;
 
+    @OneToOne
+    private Customer customer;
+
 }

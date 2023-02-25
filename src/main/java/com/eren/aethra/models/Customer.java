@@ -35,4 +35,7 @@ public class Customer extends Item {
     @ElementCollection
     private List<String> visitedProductsCodes;
 
+    @ManyToOne
+    private Store store;
+
 }

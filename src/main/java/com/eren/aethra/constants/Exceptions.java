@@ -11,7 +11,7 @@ public class Exceptions {
     public static final String THERE_IS_NO_PRODUCT_TO_DECREASE = "There is no product to decrease from cart.";
     public static final String QUANTITY_OF_THE_PRODUCT_CANT_BE_REDUCED = "The quantity of the product cannot be further reduced.";
     public static final String QUANTITY_OF_THE_PRODUCT_CANT_BE_NEGATIVE = "The quantity of the product cannot be zero or negative with code : ";
-    public static final String THIS_ORDER_DOES_BELONGS_TO_ANOTHER_CUSTOMER = "This order belongs to another customer, so it can't be viewed.";
+    public static final String THIS_ORDER_BELONGS_TO_ANOTHER_CUSTOMER = "This order belongs to another customer, so it can't be viewed.";
     public static final String THERE_IS_NO_ORDER = "There is no order with code : ";
     public static final String ADDRESS_NOT_FOUND_CODE = "Address not found with code : ";
 

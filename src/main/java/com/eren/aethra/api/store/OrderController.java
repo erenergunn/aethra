@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/order")
-public class OrderPageController {
+public class OrderController {
 
     @Resource
     OrderService orderService;

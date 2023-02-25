@@ -2,7 +2,7 @@ package com.eren.aethra.models;
 
 
 import com.eren.aethra.enums.OrderStatus;
-import com.eren.aethra.enums.PaymentMethod;
+import com.eren.aethra.models.address.Address;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
@@ -32,11 +32,10 @@ public class Order extends Item {
     @ManyToOne
     private Customer customer;
 
-    private PaymentMethod paymentMethod;
 
     private OrderStatus orderStatus;
 
-    private String address;
+    private Address address;
 
     private String shippingTrackingLink;
 

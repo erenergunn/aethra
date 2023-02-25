@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/cart")
-public class CartPageController {
+public class CartController {
 
     @Resource
     private CartService cartService;
