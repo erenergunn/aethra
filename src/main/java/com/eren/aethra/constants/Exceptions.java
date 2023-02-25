@@ -14,5 +14,6 @@ public class Exceptions {
     public static final String THIS_ORDER_BELONGS_TO_ANOTHER_CUSTOMER = "This order belongs to another customer, so it can't be viewed.";
     public static final String THERE_IS_NO_ORDER = "There is no order with code : ";
     public static final String ADDRESS_NOT_FOUND_CODE = "Address not found with code : ";
+    public static final String NO_ADDRESS_FOR_CUSTOMER = "For this customer, there is no address with code : ";
 
 }

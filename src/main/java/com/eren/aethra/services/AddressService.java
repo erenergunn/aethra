@@ -9,4 +9,8 @@ public interface AddressService {
 
     void editAddress(String code, AddressRequest addressRequest) throws Exception;
 
+    void createAddress(AddressRequest addressRequest) throws Exception;
+
+    void deleteAddress(String addressCode) throws Exception;
+
 }

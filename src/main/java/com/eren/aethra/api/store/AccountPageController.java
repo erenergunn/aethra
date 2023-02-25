@@ -55,6 +55,16 @@ public class AccountPageController {
         }
     }
 
+    @PostMapping("/create-address")
+    public ResponseEntity createAddress(AddressRequest addressRequest) {
+        try {
+            addressService.createAddress(addressRequest);
+            return new ResponseEntity<>(AethraCoreConstants.ADDRESS_ADDED_SUCCESSFULLY, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping("/edit-address/{addressCode}")
     public ResponseEntity editAddress(@PathVariable String addressCode) {
         try {
@@ -64,13 +74,22 @@ public class AccountPageController {
         }
     }
 
-
-    @PostMapping("/edit-address/{addressCode}")
-    public ResponseEntity editAddress(@PathVariable String addressCode, @RequestBody AddressRequest addressDto) {
+    @PutMapping("/edit-address/{addressCode}")
+    public ResponseEntity editAddress(@PathVariable String addressCode, @RequestBody AddressRequest addressRequest) {
         try {
-            addressService.editAddress(addressCode, addressDto);
+            addressService.editAddress(addressCode, addressRequest);
             return new ResponseEntity<>(AethraCoreConstants.ADDRESS_UPDATED_SUCCESSFULLY, HttpStatus.OK);
         } catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/delete-address/{addressCode}")
+    public ResponseEntity deleteAddress(@PathVariable String addressCode) {
+        try {
+            addressService.deleteAddress(addressCode);
+            return new ResponseEntity<>(AethraCoreConstants.ADDRESS_DELETED_SUCCESSFULLY, HttpStatus.OK);
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }

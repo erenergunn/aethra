@@ -1,5 +1,6 @@
 package com.eren.aethra.models.address;
 
+import com.eren.aethra.models.Customer;
 import com.eren.aethra.models.Item;
 import lombok.Data;
 
@@ -21,5 +22,8 @@ public class Address extends Item {
     private District district;
 
     private String address;
+
+    @ManyToOne
+    private Customer customer;
 
 }
