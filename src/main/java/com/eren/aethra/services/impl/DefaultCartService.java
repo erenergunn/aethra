@@ -49,21 +49,28 @@ public class DefaultCartService implements CartService {
     @Override
     public void addProductToCart(String productCode, Integer qty) throws Exception {
         Entry entry = new Entry();
-        entry.setProduct(productService.findProductByCode(productCode));
-        if(qty <= 0){
-            throw new Exception(Exceptions.QUANTITY_OF_THE_PRODUCT_CANT_BE_NEGATIVE + productCode);
-        }
-        entry.setQuantity(qty);
-        Cart cart = sessionService.getCurrentCart();
-        if(Objects.nonNull(cart)){
-            List<Entry> entries = CollectionUtils.isNotEmpty(cart.getEntries()) ? cart.getEntries() : new ArrayList<>();
-            entries.add(entry);
-            cart.setEntries(entries);
+        Product product = productService.findProductByCode(productCode);
+        if (qty < product.getStockValue()) {
+            if(qty <= 0){
+                throw new Exception(Exceptions.QUANTITY_OF_THE_PRODUCT_CANT_BE_NEGATIVE + productCode);
+            }
+            entry.setProduct(product);
+            entry.setQuantity(qty); {
+
+            }
+            Cart cart = sessionService.getCurrentCart();
+            if(Objects.nonNull(cart)){
+                List<Entry> entries = CollectionUtils.isNotEmpty(cart.getEntries()) ? cart.getEntries() : new ArrayList<>();
+                entries.add(entry);
+                cart.setEntries(entries);
+            } else {
+                cart = new Cart();
+                cart.setEntries(Collections.singletonList(entry));
+            }
+            modelDao.save(cart);
         } else {
-            cart = new Cart();
-            cart.setEntries(Collections.singletonList(entry));
+            throw new Exception(Exceptions.NOT_ENOUGH_STOCK);
         }
-        modelDao.save(cart);
     }
 
     @Override
@@ -84,24 +91,20 @@ public class DefaultCartService implements CartService {
 
     @Override
     public void updateProductQuantity(String productCode, Integer qty) throws Exception {
-        Product productModel = productService.findProductByCode(productCode);
+        Product product = productService.findProductByCode(productCode);
         Cart cart = sessionService.getCurrentCart();
-        if(Objects.nonNull(cart)){
-            Entry targetEntry = cart.getEntries().stream().filter(entry -> entry.getProduct().equals(productModel)).findFirst()
-                    .orElseThrow(() -> new Exception(Exceptions.THERE_IS_NO_PRODUCT_TO_INCREASE));
-            targetEntry.setQuantity(qty);
-            modelDao.save(targetEntry);
+        if (qty < product.getStockValue()) {
+            if(qty <= 0){
+                throw new Exception(Exceptions.QUANTITY_OF_THE_PRODUCT_CANT_BE_NEGATIVE + productCode);
+            }
+            if(Objects.nonNull(cart)){
+                Entry targetEntry = cart.getEntries().stream().filter(entry -> entry.getProduct().equals(product)).findFirst()
+                        .orElseThrow(() -> new Exception(Exceptions.THERE_IS_NO_PRODUCT_TO_INCREASE));
+                targetEntry.setQuantity(qty);
+                modelDao.save(targetEntry);
+            }
+        } else {
+            throw new Exception(Exceptions.NOT_ENOUGH_STOCK);
         }
     }
-
-    private boolean checkQuantityToDecrease(Integer quantity) throws Exception {
-        if(Objects.isNull(quantity)){
-            throw new Exception(Exceptions.THERE_IS_NO_PRODUCT_TO_DECREASE);
-        }
-        if(quantity <= 1){
-            throw new Exception(Exceptions.QUANTITY_OF_THE_PRODUCT_CANT_BE_REDUCED);
-        }
-        return true;
-    }
-
 }
