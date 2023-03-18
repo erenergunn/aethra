@@ -84,27 +84,13 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void increaseProductQuantity(String productCode) throws Exception {
+    public void updateProductQuantity(String productCode, Integer qty) throws Exception {
         Product productModel = productService.findProductByCode(productCode);
         Cart cart = sessionService.getCurrentCart();
         if(Objects.nonNull(cart)){
             Entry targetEntry = cart.getEntries().stream().filter(entry -> entry.getProduct().equals(productModel)).findFirst()
                     .orElseThrow(() -> new Exception(Exceptions.THERE_IS_NO_PRODUCT_TO_INCREASE));
-            targetEntry.setQuantity(Objects.nonNull(targetEntry.getQuantity()) ? targetEntry.getQuantity() + 1 : 1);
-            modelDao.save(targetEntry);
-        }
-    }
-
-    @Override
-    public void decreaseProductQuantity(String productCode) throws Exception {
-        Product productModel = productService.findProductByCode(productCode);
-        Cart cart = sessionService.getCurrentCart();
-        if(Objects.nonNull(cart)){
-            Entry targetEntry = cart.getEntries().stream().filter(entry -> entry.getProduct().equals(productModel)).findFirst()
-                    .orElseThrow(() -> new Exception(Exceptions.THERE_IS_NO_PRODUCT_TO_INCREASE + productCode));
-            if(checkQuantityToDecrease(targetEntry.getQuantity())){
-                targetEntry.setQuantity(targetEntry.getQuantity() - 1);
-            }
+            targetEntry.setQuantity(qty);
             modelDao.save(targetEntry);
         }
     }

@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/c")
-public class CategoryPageController {
+public class CategoryController {
 
     @Resource
     private CategoryService categoryService;

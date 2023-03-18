@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("")
-public class HomepageController {
+public class CmsController {
 
-    @GetMapping("/")
-    public ResponseEntity<String> deneme(){
+    @GetMapping("/homepage")
+    public ResponseEntity<String> getHomepage(){
         return new ResponseEntity<>(
                 "{\n" +
                         "    \"glossary\": {\n" +

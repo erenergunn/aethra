@@ -16,7 +16,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/my-account")
-public class AccountPageController {
+public class AccountController {
 
     @Resource
     private CustomerService customerService;

@@ -15,7 +15,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/p")
-public class ProductDetailPageController {
+public class ProductController {
 
     @Resource
     private ProductService productService;

@@ -8,7 +8,6 @@ public interface CartService {
     void validateCart(Cart cart);
     void addProductToCart(String productCode, Integer qty) throws Exception;
     void removeProductFromCart(String productCode) throws Exception;
-    void increaseProductQuantity(String productCode) throws Exception;
-    void decreaseProductQuantity(String productCode) throws Exception;
+    void updateProductQuantity(String productCode, Integer qty) throws Exception;
 
 }

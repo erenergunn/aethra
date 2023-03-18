@@ -49,21 +49,11 @@ public class CartController {
         }
     }
 
-    @PostMapping("/increase-qty")
-    public ResponseEntity increaseQuantityOfProduct(@RequestParam String productCode) {
+    @PostMapping("/update-qty")
+    public ResponseEntity updateQuantityOfProduct(@RequestParam String productCode, @RequestParam Integer qty) {
         try {
-            cartService.increaseProductQuantity(productCode);
-            return new ResponseEntity<>(AethraCoreConstants.QTY_INCREASED_SUCCESSFULLY, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @PostMapping("/decrease-qty")
-    public ResponseEntity decreaseQuantityOfProduct(@RequestParam String productCode) {
-        try {
-            cartService.decreaseProductQuantity(productCode);
-            return new ResponseEntity<>(AethraCoreConstants.QTY_DECREASED_SUCCESSFULLY, HttpStatus.OK);
+            cartService.updateProductQuantity(productCode, qty);
+            return new ResponseEntity<>(AethraCoreConstants.QTY_UPDATED_SUCCESSFULLY, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
