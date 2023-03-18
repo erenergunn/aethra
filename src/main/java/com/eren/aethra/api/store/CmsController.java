@@ -1,14 +1,20 @@
 package com.eren.aethra.api.store;
 
+import com.eren.aethra.services.StoreService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
+
 @RestController
 @RequestMapping("")
 public class CmsController {
+
+    @Resource
+    private StoreService storeService;
 
     @GetMapping("/homepage")
     public ResponseEntity<String> getHomepage(){
@@ -36,5 +42,14 @@ public class CmsController {
                         "    }\n" +
                         "}",
                 HttpStatus.OK);
+    }
+
+    @GetMapping("/store")
+    public ResponseEntity getStore() {
+        try {
+            return new ResponseEntity<>(storeService.getStore(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 }

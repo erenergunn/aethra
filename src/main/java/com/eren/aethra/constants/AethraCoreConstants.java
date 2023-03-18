@@ -2,6 +2,8 @@ package com.eren.aethra.constants;
 
 public class AethraCoreConstants {
 
+    public static final String AETHRA_STORE_CODE = "Aethra";
+
     public static final String PRODUCT_ADDED_SUCCESSFULLY = "Product is added to cart successfully.";
     public static final String PRODUCT_REMOVED_SUCCESSFULLY = "Product is removed from cart successfully.";
     public static final String QTY_UPDATED_SUCCESSFULLY = "Quantity of product is updated successfully.";

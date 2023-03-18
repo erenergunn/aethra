@@ -4,10 +4,7 @@ import com.eren.aethra.constants.Exceptions;
 import com.eren.aethra.daos.ModelDao;
 import com.eren.aethra.daos.OrderDao;
 import com.eren.aethra.enums.OrderStatus;
-import com.eren.aethra.models.Cart;
-import com.eren.aethra.models.Customer;
-import com.eren.aethra.models.Order;
-import com.eren.aethra.models.Product;
+import com.eren.aethra.models.*;
 import com.eren.aethra.services.AddressService;
 import com.eren.aethra.services.CartService;
 import com.eren.aethra.services.OrderService;
@@ -19,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class OrderServiceImpl implements OrderService {
+public class DefaultOrderService implements OrderService {
 
     @Resource
     OrderDao orderDao;
@@ -61,6 +58,7 @@ public class OrderServiceImpl implements OrderService {
     public void placeOrder(String addressCode) throws Exception {
         Order order = new Order();
         Cart cart = sessionService.getCurrentCart();
+        Store store = cart.getCustomer().getStore();
         cartService.validateCart(cart);
 
         order.setOrderEntries(cart.getEntries());
@@ -68,7 +66,7 @@ public class OrderServiceImpl implements OrderService {
         order.setCustomer(cart.getCustomer());
         order.setAddress(addressService.findAddressByCode(addressCode));
         order.setTotalPriceOfProducts(cart.getTotalPrice());
-        order.setShippingPrice(cart.getCustomer().getStore().getShippingPrice());
+        order.setShippingPrice(cart.getTotalPrice() > store.getFreeShippingThreshold() ? 0 : order.getShippingPrice());
         order.setTotalPrice(order.getTotalPriceOfProducts() + order.getShippingPrice());
         modelDao.save(order);
 

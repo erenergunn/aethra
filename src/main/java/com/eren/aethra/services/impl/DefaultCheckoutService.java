@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class CheckoutServiceImpl implements CheckoutService {
+public class DefaultCheckoutService implements CheckoutService {
 
     @Resource
     private SessionService sessionService;

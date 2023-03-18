@@ -5,14 +5,13 @@ public enum OrderStatus {
     CREATED ("Oluşturuldu"),
     RECEIVED ("Alındı"),
     IN_PREPARATION ("Hazırlanıyor"),
-    SHIPPING ("Kargoye Verildi"),
+    SHIPPING ("Kargoda"),
     DELIVERED ("Teslim Edildi"),
     COMPLETED ("Tamamlandı"),
     RETURN_REQUEST_RECEIVED ("İade İsteği Alındı"),
     RETURNED ("İade Edildi"),
     CANCEL_REQUEST_RECEIVED ("İptal İsteği Alındı"),
-    CANCELLED ("İptal Edildi"),
-    AT_THE_DOOR ("Kapıda Ödeme");
+    CANCELLED ("İptal Edildi");
 
     private final String name;
 

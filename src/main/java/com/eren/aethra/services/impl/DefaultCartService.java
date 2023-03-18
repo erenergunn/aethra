@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class CartServiceImpl implements CartService {
+public class DefaultCartService implements CartService {
 
     @Resource
     private SessionService sessionService;
@@ -28,7 +28,6 @@ public class CartServiceImpl implements CartService {
 
     @Resource
     private ModelDao modelDao;
-
 
     @Override
     public Cart getCartForCustomer() {

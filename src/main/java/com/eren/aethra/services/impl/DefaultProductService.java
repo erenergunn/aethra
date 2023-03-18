@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 import java.util.Optional;
 
 @Service
-public class ProductServiceImpl implements ProductService {
+public class DefaultProductService implements ProductService {
 
     @Resource
     private ProductDao productDao;

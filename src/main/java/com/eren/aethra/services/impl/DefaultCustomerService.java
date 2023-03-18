@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class CustomerServiceImpl implements CustomerService {
+public class DefaultCustomerService implements CustomerService {
 
     @Resource
     private CustomerDao customerDao;

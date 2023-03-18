@@ -1,12 +1,10 @@
 package com.eren.aethra.api;
 
-import com.eren.aethra.utils.JwtTokenUtil;
 import com.eren.aethra.dtos.requests.CustomerRequest;
 import com.eren.aethra.dtos.requests.JwtRequest;
 import com.eren.aethra.dtos.responses.JwtResponse;
-import com.eren.aethra.models.Customer;
 import com.eren.aethra.services.impl.JwtUserDetailsService;
-import org.modelmapper.ModelMapper;
+import com.eren.aethra.utils.JwtTokenUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,11 +12,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -35,9 +29,6 @@ public class    JwtAuthenticationController {
     @Resource
     private JwtUserDetailsService userDetailsService;
 
-    @Resource
-    private ModelMapper modelMapper;
-
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
 
@@ -53,10 +44,9 @@ public class    JwtAuthenticationController {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ResponseEntity<?> saveUser(@RequestBody CustomerRequest customerDto) {
+    public ResponseEntity<?> register(@RequestBody CustomerRequest customerDto) {
         try {
-            Customer customer = modelMapper.map(customerDto, Customer.class);
-            return ResponseEntity.ok(userDetailsService.register(customer));
+            return ResponseEntity.ok(userDetailsService.register(customerDto));
         } catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
