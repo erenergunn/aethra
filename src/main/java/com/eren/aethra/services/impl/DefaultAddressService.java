@@ -2,6 +2,8 @@ package com.eren.aethra.services.impl;
 
 import com.eren.aethra.constants.Exceptions;
 import com.eren.aethra.daos.AddressDao;
+import com.eren.aethra.daos.CityDao;
+import com.eren.aethra.daos.DistrictDao;
 import com.eren.aethra.dtos.requests.AddressRequest;
 import com.eren.aethra.models.Customer;
 import com.eren.aethra.models.address.Address;
@@ -20,6 +22,13 @@ public class DefaultAddressService implements AddressService {
     AddressDao addressDao;
 
     @Resource
+    CityDao cityDao;
+
+
+    @Resource
+    DistrictDao districtDao;
+
+    @Resource
     SessionService sessionService;
 
     @Override
@@ -36,7 +45,10 @@ public class DefaultAddressService implements AddressService {
     public void editAddress(String code, AddressRequest addressRequest) throws Exception {
         Optional<Address> optionalAddress = addressDao.getAddressByCode(code);
         if(optionalAddress.isPresent()){
-            // TODO : DTO'dan gelen veriler entity üzerine set edilecek
+            Address address = optionalAddress.get();
+            address.setCity(cityDao.getCityByName(addressRequest.getCity()));
+            address.setDistrict(districtDao.getDistrictByName(addressRequest.getDistrict()));
+            address.setAddressLine(addressRequest.getAddress());
         } else {
             throw new Exception(Exceptions.ADDRESS_NOT_FOUND_CODE + code);
         }
@@ -48,9 +60,9 @@ public class DefaultAddressService implements AddressService {
         Address address = new Address();
         address.setCustomer(customer);
         if(Objects.nonNull(addressRequest.getCity()) && Objects.nonNull(addressRequest.getDistrict()) && Objects.nonNull(addressRequest.getAddress())) {
-            address.setCity(addressRequest.getCity());
-            address.setDistrict(addressRequest.getDistrict());
-            address.setAddress(addressRequest.getAddress());
+            address.setCity(cityDao.getCityByName(addressRequest.getCity()));
+            address.setDistrict(districtDao.getDistrictByName(addressRequest.getDistrict()));
+            address.setAddressLine((addressRequest.getAddress()));
         } else {
             throw new Exception("All fields must be filled.");
         }

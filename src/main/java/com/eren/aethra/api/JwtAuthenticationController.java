@@ -18,7 +18,7 @@ import javax.annotation.Resource;
 
 @CrossOrigin
 @RestController
-public class    JwtAuthenticationController {
+public class JwtAuthenticationController {
 
     @Resource
     private AuthenticationManager authenticationManager;

@@ -54,7 +54,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
         httpSecurity.csrf().disable()
-                .authorizeRequests().antMatchers("/register","/authenticate","/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+                .authorizeRequests()
+                .antMatchers("/register","/authenticate","/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/homepage", "/store")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

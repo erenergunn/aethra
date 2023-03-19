@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = "addresses")
+@Table(name = "address")
 public class Address extends Item {
 
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -21,7 +21,7 @@ public class Address extends Item {
     @OneToOne
     private District district;
 
-    private String address;
+    private String addressLine;
 
     @ManyToOne
     private Customer customer;

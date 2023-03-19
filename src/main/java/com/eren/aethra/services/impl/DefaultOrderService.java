@@ -61,12 +61,12 @@ public class DefaultOrderService implements OrderService {
         Store store = cart.getCustomer().getStore();
         cartService.validateCart(cart);
 
-        order.setOrderEntries(cart.getEntries());
+        order.setEntries(cart.getEntries());
         order.setOrderStatus(OrderStatus.CREATED);
         order.setCustomer(cart.getCustomer());
         order.setAddress(addressService.findAddressByCode(addressCode));
-        order.setTotalPriceOfProducts(cart.getTotalPrice());
-        order.setShippingPrice(cart.getTotalPrice() > store.getFreeShippingThreshold() ? 0 : order.getShippingPrice());
+        order.setTotalPriceOfProducts(cart.getTotalPriceOfProducts());
+        order.setShippingPrice(cart.getTotalPriceOfProducts() > store.getFreeShippingThreshold() ? 0 : order.getShippingPrice());
         order.setTotalPrice(order.getTotalPriceOfProducts() + order.getShippingPrice());
         modelDao.save(order);
 

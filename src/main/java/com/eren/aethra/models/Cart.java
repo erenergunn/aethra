@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "carts")
+@Table(name = "cart")
 public class Cart extends Item {
 
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -17,7 +17,7 @@ public class Cart extends Item {
     @OneToMany
     private List<Entry> entries;
 
-    private Double totalPrice;
+    private Double totalPriceOfProducts;
 
     @OneToOne
     private Customer customer;

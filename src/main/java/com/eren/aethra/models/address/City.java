@@ -1,22 +1,16 @@
 package com.eren.aethra.models.address;
 
+import com.eren.aethra.models.Item;
 import lombok.Data;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Data
 @Entity
-@Table(name = "cities")
-public class City {
-
-    @Id
-    @Column(name = "code")
-    private Integer code;
+@Table(name = "city")
+public class City extends Item {
 
     private String name;
-
-    @OneToMany
-    private List<District> districts;
 
 }

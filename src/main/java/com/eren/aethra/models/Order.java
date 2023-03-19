@@ -11,30 +11,16 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "orders")
-public class Order extends Item {
-
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(unique = true, nullable = false)
-    private String code;
-
-    @OneToMany
-    private List<Entry> orderEntries;
-
-    private Double totalPriceOfProducts;
+@Table(name = "order")
+public class Order extends Cart {
 
     private Double shippingPrice;
 
     private Double totalPrice;
 
-    @JsonBackReference
-    @JoinColumn(name = "customer_id", nullable = false)
-    @ManyToOne
-    private Customer customer;
-
-
     private OrderStatus orderStatus;
 
+    @OneToOne
     private Address address;
 
     private String shippingTrackingLink;

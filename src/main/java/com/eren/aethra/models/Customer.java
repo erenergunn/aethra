@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "customers")
+@Table(name = "customer")
 public class Customer extends Item {
 
     @Column(unique = true)

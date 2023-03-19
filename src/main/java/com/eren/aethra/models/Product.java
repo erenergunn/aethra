@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "products")
+@Table(name = "product")
 public class Product extends Item {
 
     @Column(unique = true)
@@ -30,7 +30,7 @@ public class Product extends Item {
     private Double price;
 
     @JsonBackReference
-    @JoinColumn(name = "category_id", nullable = false)
+    @JoinColumn(name = "category", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Category category;
 
