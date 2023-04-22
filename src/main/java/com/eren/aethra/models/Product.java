@@ -25,7 +25,7 @@ public class Product extends Item {
 
     private Integer stockValue;
 
-    private boolean isApproved;
+    private Boolean isApproved;
 
     private Double price;
 

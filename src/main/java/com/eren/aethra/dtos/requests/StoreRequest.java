@@ -1,6 +1,6 @@
-package com.eren.aethra.dtos.responses;
+package com.eren.aethra.dtos.requests;
 
-public class StoreResponse {
+public class StoreRequest {
 
     private String code;
 

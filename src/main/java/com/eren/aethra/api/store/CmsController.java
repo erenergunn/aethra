@@ -1,11 +1,11 @@
 package com.eren.aethra.api.store;
 
+import com.eren.aethra.constants.AethraCoreConstants;
+import com.eren.aethra.dtos.requests.StoreRequest;
 import com.eren.aethra.services.StoreService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -48,6 +48,16 @@ public class CmsController {
     public ResponseEntity getStore() {
         try {
             return new ResponseEntity<>(storeService.getStore(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/store/update")
+    public ResponseEntity updateStore(@RequestBody StoreRequest storeRequest) {
+        try {
+            storeService.updateStore(storeRequest);
+            return new ResponseEntity<>(AethraCoreConstants.STORE_UPDATED_SUCCESSFULLY, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
