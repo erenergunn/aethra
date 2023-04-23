@@ -2,6 +2,7 @@ package com.eren.aethra.services.impl;
 
 import com.eren.aethra.constants.Exceptions;
 import com.eren.aethra.daos.ModelDao;
+import com.eren.aethra.helpers.RatingCalculationHelper;
 import com.eren.aethra.models.Cart;
 import com.eren.aethra.models.Entry;
 import com.eren.aethra.models.Product;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class DefaultCartService implements CartService {
@@ -28,6 +30,9 @@ public class DefaultCartService implements CartService {
 
     @Resource
     private ModelDao modelDao;
+
+    @Resource
+    private RatingCalculationHelper ratingCalculationHelper;
 
     @Override
     public Cart getCartForCustomer() {
@@ -67,6 +72,9 @@ public class DefaultCartService implements CartService {
                 cart = new Cart();
                 cart.setEntries(Collections.singletonList(entry));
             }
+            List<Product> products = cart.getEntries().stream().map(Entry::getProduct).collect(Collectors.toList());
+            ratingCalculationHelper.createOrRecalculateRatingOfP2P(products, product, 1D, 3);
+            ratingCalculationHelper.createOrRecalculateRatingOfC2P(cart.getCustomer(), product, 1.5, 5);
             modelDao.save(cart);
         } else {
             throw new Exception(Exceptions.NOT_ENOUGH_STOCK);

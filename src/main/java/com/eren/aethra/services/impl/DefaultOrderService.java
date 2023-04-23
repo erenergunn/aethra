@@ -4,6 +4,7 @@ import com.eren.aethra.constants.Exceptions;
 import com.eren.aethra.daos.ModelDao;
 import com.eren.aethra.daos.OrderDao;
 import com.eren.aethra.enums.OrderStatus;
+import com.eren.aethra.helpers.RatingCalculationHelper;
 import com.eren.aethra.models.*;
 import com.eren.aethra.services.AddressService;
 import com.eren.aethra.services.CartService;
@@ -12,8 +13,10 @@ import com.eren.aethra.services.SessionService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DefaultOrderService implements OrderService {
@@ -32,6 +35,9 @@ public class DefaultOrderService implements OrderService {
 
     @Resource
     CartService cartService;
+
+    @Resource
+    RatingCalculationHelper ratingCalculationHelper;
 
     @Override
     public List<Order> getOrdersForCustomer() {
@@ -57,7 +63,8 @@ public class DefaultOrderService implements OrderService {
     @Override
     public void placeOrder(String addressCode) throws Exception {
         Order order = new Order();
-        Cart cart = sessionService.getCurrentCart();
+        Customer customer = sessionService.getCurrentCustomer();
+        Cart cart = customer.getCart();
         Store store = cart.getCustomer().getStore();
         cartService.validateCart(cart);
 
@@ -70,14 +77,22 @@ public class DefaultOrderService implements OrderService {
         order.setTotalPrice(order.getTotalPriceOfProducts() + order.getShippingPrice());
         modelDao.save(order);
 
-        cart.getEntries().forEach(entry -> {
+        List<Entry> entries = cart.getEntries();
+        List<Product> products = entries.stream().map(Entry::getProduct).collect(Collectors.toList());
+
+        entries.forEach(entry -> {
             Product product = entry.getProduct();
             product.setStockValue(product.getStockValue() - entry.getQuantity());
             modelDao.save(product);
+            ratingCalculationHelper.createOrRecalculateRatingOfP2P(products, product, 3D, 10);
+            ratingCalculationHelper.createOrRecalculateRatingOfC2P(customer, product, 4D, 15);
+
         });
 
-        cart.setEntries(null);
+        cart.setEntries(Collections.emptyList());
+        cart.setTotalPriceOfProducts(0D);
         modelDao.save(cart);
     }
+
 
 }

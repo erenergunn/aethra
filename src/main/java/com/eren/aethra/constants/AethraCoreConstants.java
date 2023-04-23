@@ -12,5 +12,6 @@ public class AethraCoreConstants {
     public static final String ADDRESS_UPDATED_SUCCESSFULLY = "Address is updated successfully.";
     public static final String ADDRESS_DELETED_SUCCESSFULLY = "Address is deleted successfully.";
     public static final String STORE_UPDATED_SUCCESSFULLY = "Store is updated successfully.";
+    public static final String ORDER_PLACED_SUCCESSFULLY = "Order placed successfully.";
 
 }
