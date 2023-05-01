@@ -3,28 +3,29 @@ package com.eren.aethra.dtos.requests;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class ProductRequest {
 
-    private String code;
+    String code;
 
-    private String name;
+    String name;
 
-    private String description;
+    String description;
 
-    private String picture;
+    String picture;
 
-    private List<String> galleryImages;
+    Set<String> galleryImages;
 
-    private Integer stockValue;
+    Integer stockValue;
 
-    private Boolean isApproved;
+    Boolean isApproved;
 
-    private Double price;
+    Double price;
 
-    private String categoryCode;
+    String categoryCode;
 
-    private List<String> keywords;
+    Set<String> keywords;
 
 }

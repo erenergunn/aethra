@@ -7,8 +7,8 @@ import java.util.List;
 @Data
 public class ProductListResponse {
 
-    private CategoryResponse category;
+    CategoryResponse category;
 
-    private List<ProductResponse> products;
+    List<ProductResponse> products;
 
 }

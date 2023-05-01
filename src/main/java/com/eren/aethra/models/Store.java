@@ -10,7 +10,7 @@ import javax.persistence.*;
 public class Store extends Item {
 
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String code;
 
     private String name;

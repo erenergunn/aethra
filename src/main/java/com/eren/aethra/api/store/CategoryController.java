@@ -26,4 +26,13 @@ public class CategoryController {
         }
     }
 
+    @GetMapping
+    public ResponseEntity getCategories() {
+        try {
+            return new ResponseEntity<>(categoryService.getCategories(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }

@@ -1,7 +1,8 @@
-package com.eren.aethra.models.address;
+package com.eren.aethra.models;
 
 import com.eren.aethra.models.Customer;
 import com.eren.aethra.models.Item;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -11,19 +12,15 @@ import javax.persistence.*;
 @Table(name = "address")
 public class Address extends Item {
 
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(unique = true, nullable = false)
     private String code;
 
-    @OneToOne
-    private City city;
+    private String name;
 
-    @OneToOne
-    private District district;
-
-    private String addressLine;
+    private String address;
 
     @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "customer")
     private Customer customer;
 
 }

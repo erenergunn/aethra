@@ -1,5 +1,6 @@
 package com.eren.aethra.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 
@@ -18,9 +19,5 @@ public class Category extends Item {
     private String name;
 
     private String description;
-
-    @JsonManagedReference
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
-    private List<Product> products;
 
 }

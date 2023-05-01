@@ -1,7 +1,7 @@
 package com.eren.aethra.services;
 
 import com.eren.aethra.dtos.requests.AddressRequest;
-import com.eren.aethra.models.address.Address;
+import com.eren.aethra.models.Address;
 
 public interface AddressService {
 

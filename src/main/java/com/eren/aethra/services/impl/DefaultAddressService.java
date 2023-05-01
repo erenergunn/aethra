@@ -2,11 +2,9 @@ package com.eren.aethra.services.impl;
 
 import com.eren.aethra.constants.Exceptions;
 import com.eren.aethra.daos.AddressDao;
-import com.eren.aethra.daos.CityDao;
-import com.eren.aethra.daos.DistrictDao;
 import com.eren.aethra.dtos.requests.AddressRequest;
+import com.eren.aethra.models.Address;
 import com.eren.aethra.models.Customer;
-import com.eren.aethra.models.address.Address;
 import com.eren.aethra.services.AddressService;
 import com.eren.aethra.services.SessionService;
 import org.springframework.stereotype.Service;
@@ -22,18 +20,11 @@ public class DefaultAddressService implements AddressService {
     AddressDao addressDao;
 
     @Resource
-    CityDao cityDao;
-
-
-    @Resource
-    DistrictDao districtDao;
-
-    @Resource
     SessionService sessionService;
 
     @Override
     public Address findAddressByCode(String code) throws Exception {
-        Optional<Address> optionalAddress = addressDao.getAddressByCode(code);
+        Optional<Address> optionalAddress = addressDao.getAddressByCodeAndCustomer(code, sessionService.getCurrentCustomer());
         if(optionalAddress.isPresent()) {
             return optionalAddress.get();
         } else {
@@ -43,12 +34,10 @@ public class DefaultAddressService implements AddressService {
 
     @Override
     public void editAddress(String code, AddressRequest addressRequest) throws Exception {
-        Optional<Address> optionalAddress = addressDao.getAddressByCode(code);
+        Optional<Address> optionalAddress = addressDao.getAddressByCodeAndCustomer(code, sessionService.getCurrentCustomer());
         if(optionalAddress.isPresent()){
             Address address = optionalAddress.get();
-            address.setCity(cityDao.getCityByName(addressRequest.getCity()));
-            address.setDistrict(districtDao.getDistrictByName(addressRequest.getDistrict()));
-            address.setAddressLine(addressRequest.getAddress());
+            address.setAddress(addressRequest.getAddress());
         } else {
             throw new Exception(Exceptions.ADDRESS_NOT_FOUND_CODE + code);
         }
@@ -59,10 +48,9 @@ public class DefaultAddressService implements AddressService {
         Customer customer = sessionService.getCurrentCustomer();
         Address address = new Address();
         address.setCustomer(customer);
-        if(Objects.nonNull(addressRequest.getCity()) && Objects.nonNull(addressRequest.getDistrict()) && Objects.nonNull(addressRequest.getAddress())) {
-            address.setCity(cityDao.getCityByName(addressRequest.getCity()));
-            address.setDistrict(districtDao.getDistrictByName(addressRequest.getDistrict()));
-            address.setAddressLine((addressRequest.getAddress()));
+        if(Objects.nonNull(Objects.nonNull(addressRequest.getAddress()))) {
+            address.setAddress((addressRequest.getAddress()));
+            address.setCode(addressRequest.getCode());
         } else {
             throw new Exception("All fields must be filled.");
         }
@@ -71,11 +59,12 @@ public class DefaultAddressService implements AddressService {
     @Override
     public void deleteAddress(String addressCode) throws Exception {
         Customer customer = sessionService.getCurrentCustomer();
-        Address addressModel = customer.getAddresses().stream()
-                .filter(address -> address.getCode().equals(addressCode))
-                .findFirst()
-                .orElseThrow(() -> new Exception(Exceptions.NO_ADDRESS_FOR_CUSTOMER + addressCode));
-        addressDao.delete(addressModel);
+        Optional<Address> optionalAddress = addressDao.getAddressByCodeAndCustomer(addressCode, customer);
+        if (optionalAddress.isPresent()) {
+            addressDao.delete(optionalAddress.get());
+        } else {
+            throw new Exception("Address not found for code: " + addressCode);
+        }
     }
 
 }

@@ -1,10 +1,10 @@
 package com.eren.aethra.models;
 
-import com.eren.aethra.models.address.Address;
+import com.sun.istack.Nullable;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -23,17 +23,9 @@ public class Customer extends Item {
 
     private String password;
 
-    @OneToOne
-    private Cart cart;
-
-    @OneToMany
-    private List<Product> favProducts;
-
-    @OneToMany
-    private List<Address> addresses;
-
-    @ElementCollection
-    private List<String> visitedProductsCodes;
+    @OneToMany(fetch = FetchType.EAGER)
+    @Nullable
+    private Set<Product> favProducts;
 
     @ManyToOne
     private Store store;

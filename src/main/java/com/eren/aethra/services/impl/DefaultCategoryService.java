@@ -32,6 +32,15 @@ public class DefaultCategoryService implements CategoryService {
     private ModelMapper modelMapper;
 
     @Override
+    public List<CategoryResponse> getCategories() {
+        List<Category> categories = categoryDao.findAll();
+        return categories
+                .stream()
+                .map(category -> modelMapper.map(category, CategoryResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public ProductListResponse getCategoryPage(String code) throws Exception {
 
         ProductListResponse response = new ProductListResponse();
@@ -45,6 +54,7 @@ public class DefaultCategoryService implements CategoryService {
             if(productList.isEmpty()){
                 throw new Exception(Exceptions.PRODUCT_NOT_FOUND_FOR_CATEGORY + optionalCategory.get().getCode());
             }
+            response.setCategory(modelMapper.map(optionalCategory.get(), CategoryResponse.class));
             response.setProducts(productList
                     .stream()
                     .map(product -> modelMapper.map(product, ProductResponse.class))

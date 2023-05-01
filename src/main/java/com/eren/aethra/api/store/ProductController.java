@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("/p")
@@ -28,6 +29,15 @@ public class ProductController {
         try {
             Product productModel = productService.findProductByCode(productCode);
             return new ResponseEntity<>(modelMapper.map(productModel, ProductResponse.class), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/recommendations")
+    public ResponseEntity getRecommendedProducts() {
+        try {
+            return new ResponseEntity(productService.getRecommendedProducts(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

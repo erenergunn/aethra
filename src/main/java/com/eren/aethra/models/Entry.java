@@ -17,7 +17,4 @@ public class Entry extends Item {
 
     private Integer quantity;
 
-    @ManyToOne
-    private Cart cart;
-
 }

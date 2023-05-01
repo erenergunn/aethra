@@ -1,10 +1,12 @@
 package com.eren.aethra.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -20,8 +22,8 @@ public class Product extends Item {
 
     private String picture;
 
-    @ElementCollection
-    private List<String> galleryImages;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<String> galleryImages;
 
     private Integer stockValue;
 
@@ -34,7 +36,7 @@ public class Product extends Item {
     @ManyToOne(fetch = FetchType.LAZY)
     private Category category;
 
-    @ElementCollection
-    private List<String> keywords;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<String> keywords;
 
 }

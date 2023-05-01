@@ -1,19 +1,27 @@
 package com.eren.aethra.services.impl;
 
 import com.eren.aethra.constants.Exceptions;
+import com.eren.aethra.daos.C2PDao;
 import com.eren.aethra.daos.ProductDao;
 import com.eren.aethra.dtos.requests.ProductRequest;
+import com.eren.aethra.dtos.responses.ProductResponse;
+import com.eren.aethra.helpers.RatingHelper;
 import com.eren.aethra.models.Category;
+import com.eren.aethra.models.Customer;
 import com.eren.aethra.models.Product;
 import com.eren.aethra.services.CategoryService;
 import com.eren.aethra.services.ProductService;
+import com.eren.aethra.services.SessionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DefaultProductService implements ProductService {
@@ -23,6 +31,18 @@ public class DefaultProductService implements ProductService {
 
     @Resource
     private CategoryService categoryService;
+
+    @Resource
+    private SessionService sessionService;
+
+    @Resource
+    private ModelMapper modelMapper;
+
+    @Resource
+    private C2PDao c2PDao;
+
+    @Resource
+    private RatingHelper ratingHelper;
 
     @Override
     public Product findProductByCode(String code) throws Exception {
@@ -35,7 +55,21 @@ public class DefaultProductService implements ProductService {
     }
 
     @Override
-    public void createOrUpdateProduct(ProductRequest dto) {
+    public List<ProductResponse> getRecommendedProducts() throws Exception {
+        Customer customer = sessionService.getCurrentCustomer();
+        return ratingHelper.getRecommendedProductsForCustomer(customer)
+                .stream()
+                .map(product -> modelMapper.map(product, ProductResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductResponse> getBestSellingProducts() {
+        return null;
+    }
+
+    @Override
+    public void createOrUpdateProduct(ProductRequest dto) throws Exception {
         Product product;
         Optional<Product> optionalProduct = productDao.getProductByCode(dto.getCode());
         if (optionalProduct.isPresent()){
@@ -48,7 +82,11 @@ public class DefaultProductService implements ProductService {
             Category category = categoryService.getCategoryForCode(dto.getCategoryCode());
             if (category != null) {
                 product.setCategory(category);
+            } else {
+                throw new Exception("Category not found for : " + dto.getCategoryCode());
             }
+        } else {
+            throw new Exception("Category not found for : " + dto.getCategoryCode());
         }
         if (StringUtils.isNotBlank(dto.getName())) {
             product.setName(dto.getName());

@@ -1,19 +1,21 @@
 package com.eren.aethra.services.impl;
 
 import com.eren.aethra.dtos.requests.CustomerRequest;
+import com.eren.aethra.dtos.responses.CustomerResponse;
 import com.eren.aethra.models.Customer;
 import com.eren.aethra.services.CustomerService;
 import lombok.SneakyThrows;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
@@ -36,10 +38,12 @@ public class JwtUserDetailsService implements UserDetailsService {
                 new ArrayList<>());
     }
 
-    public Customer register(CustomerRequest request) {
+    public CustomerResponse register(CustomerRequest request) {
         Customer customer = modelMapper.map(request, Customer.class);
         customer.setPassword(bcryptEncoder.encode(customer.getPassword()));
-        return customerService.register(customer);
+        customer.setFavProducts(Collections.emptySet());
+        customerService.register(customer);
+        return modelMapper.map(customer, CustomerResponse.class);
     }
 
 }

@@ -1,9 +1,10 @@
 package com.eren.aethra.models;
 
+import com.sun.istack.Nullable;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -11,11 +12,12 @@ import java.util.List;
 public class Cart extends Item {
 
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String code;
 
-    @OneToMany
-    private List<Entry> entries;
+    @OneToMany(fetch = FetchType.EAGER)
+    @Nullable
+    private Set<Entry> entries;
 
     private Double totalPriceOfProducts;
 

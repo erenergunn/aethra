@@ -1,6 +1,8 @@
 package com.eren.aethra.services.impl;
 
+import com.eren.aethra.daos.AddressDao;
 import com.eren.aethra.daos.ModelDao;
+import com.eren.aethra.models.Address;
 import com.eren.aethra.utils.JwtTokenUtil;
 import com.eren.aethra.dtos.requests.CustomerRequest;
 import com.eren.aethra.constants.Exceptions;
@@ -25,6 +27,9 @@ public class DefaultCustomerService implements CustomerService {
 
     @Resource
     private ModelDao modelDao;
+
+    @Resource
+    private AddressDao addressDao;
 
     @Resource
     private JwtTokenUtil jwtTokenUtil;
@@ -69,7 +74,8 @@ public class DefaultCustomerService implements CustomerService {
     @Override
     public List<AddressResponse> getAddressesForCustomer() throws Exception {
         Customer customer = jwtTokenUtil.getUserFromToken();
-        return Objects.nonNull(customer.getAddresses()) ? customer.getAddresses()
+        List<Address> addresses = addressDao.getAddressesByCustomer(customer);
+        return Objects.nonNull(addresses) && addresses.size() > 0 ? addresses
                 .stream()
                 .map(address -> modelMapper.map(address, AddressResponse.class))
                 .collect(Collectors.toList())

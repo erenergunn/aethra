@@ -8,6 +8,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.eren.aethra.daos.CartDao;
+import com.eren.aethra.models.Customer;
 import com.eren.aethra.services.SessionService;
 import com.eren.aethra.utils.JwtTokenUtil;
 import com.eren.aethra.services.impl.JwtUserDetailsService;
@@ -34,6 +36,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Resource
     SessionService sessionService;
+
+    @Resource
+    CartDao cartDao;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -74,8 +79,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
                 try {
-                    sessionService.setCurrentCustomer(jwtTokenUtil.getUserFromToken());
-                    sessionService.setCurrentCart(sessionService.getCurrentCustomer().getCart());
+                    Customer customer = jwtTokenUtil.getUserFromToken();
+                    sessionService.setCurrentCustomer(customer);
+                    sessionService.setCurrentCart(cartDao.findCartByCustomer(customer));
                 } catch (Exception e) {
                     System.out.println("Error while creating session");
                 }

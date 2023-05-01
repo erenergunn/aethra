@@ -1,10 +1,11 @@
 package com.eren.aethra.services.impl;
 
 import com.eren.aethra.constants.Exceptions;
+import com.eren.aethra.daos.CartDao;
 import com.eren.aethra.daos.ModelDao;
 import com.eren.aethra.daos.OrderDao;
 import com.eren.aethra.enums.OrderStatus;
-import com.eren.aethra.helpers.RatingCalculationHelper;
+import com.eren.aethra.helpers.RatingHelper;
 import com.eren.aethra.models.*;
 import com.eren.aethra.services.AddressService;
 import com.eren.aethra.services.CartService;
@@ -16,28 +17,32 @@ import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class DefaultOrderService implements OrderService {
 
     @Resource
-    OrderDao orderDao;
+    private OrderDao orderDao;
 
     @Resource
-    ModelDao modelDao;
+    private ModelDao modelDao;
+
+    @Resource
+    private CartDao cartDao;
 
     @Resource
     private SessionService sessionService;
 
     @Resource
-    AddressService addressService;
+    private AddressService addressService;
 
     @Resource
-    CartService cartService;
+    private CartService cartService;
 
     @Resource
-    RatingCalculationHelper ratingCalculationHelper;
+    private RatingHelper ratingHelper;
 
     @Override
     public List<Order> getOrdersForCustomer() {
@@ -64,7 +69,7 @@ public class DefaultOrderService implements OrderService {
     public void placeOrder(String addressCode) throws Exception {
         Order order = new Order();
         Customer customer = sessionService.getCurrentCustomer();
-        Cart cart = customer.getCart();
+        Cart cart = sessionService.getCurrentCart();
         Store store = cart.getCustomer().getStore();
         cartService.validateCart(cart);
 
@@ -77,19 +82,19 @@ public class DefaultOrderService implements OrderService {
         order.setTotalPrice(order.getTotalPriceOfProducts() + order.getShippingPrice());
         modelDao.save(order);
 
-        List<Entry> entries = cart.getEntries();
+        Set<Entry> entries = cart.getEntries();
         List<Product> products = entries.stream().map(Entry::getProduct).collect(Collectors.toList());
 
         entries.forEach(entry -> {
             Product product = entry.getProduct();
             product.setStockValue(product.getStockValue() - entry.getQuantity());
             modelDao.save(product);
-            ratingCalculationHelper.createOrRecalculateRatingOfP2P(products, product, 3D, 10);
-            ratingCalculationHelper.createOrRecalculateRatingOfC2P(customer, product, 4D, 15);
+            ratingHelper.createOrRecalculateRatingOfP2P(products, product, 3D, 10);
+            ratingHelper.createOrRecalculateRatingOfC2P(customer, product, 4D, 15);
 
         });
 
-        cart.setEntries(Collections.emptyList());
+        cart.setEntries(Collections.emptySet());
         cart.setTotalPriceOfProducts(0D);
         modelDao.save(cart);
     }
