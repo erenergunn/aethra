@@ -14,9 +14,6 @@ public class Customer extends Item {
     @Column(unique = true)
     private String username;
 
-    @Column(unique = true)
-    private String contactMail;
-
     private String firstName;
 
     private String lastName;

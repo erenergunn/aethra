@@ -7,8 +7,6 @@ public class CustomerResponse {
 
     String username;
 
-    String contactMail;
-
     String firstName;
 
     String lastName;

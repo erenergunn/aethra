@@ -2,6 +2,7 @@ package com.eren.aethra.services;
 
 import com.eren.aethra.dtos.requests.ProductRequest;
 import com.eren.aethra.dtos.responses.ProductResponse;
+import com.eren.aethra.models.Category;
 import com.eren.aethra.models.Product;
 
 import java.util.List;
@@ -15,5 +16,7 @@ public interface ProductService {
     List<ProductResponse> getBestSellingProducts();
 
     public void createOrUpdateProduct(ProductRequest dto) throws Exception;
+
+    List<Product> getProductModelsForCategory(Category category);
 
 }

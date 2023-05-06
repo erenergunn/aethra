@@ -10,6 +10,6 @@ public interface P2PDao extends JpaRepository<Product2ProductRating, Long> {
 
     Product2ProductRating findBySourceAndAndTarget(Product source, Product target);
 
-    List<Product2ProductRating> getProduct2ProductRatingsByTarget(Product source);
+    List<Product2ProductRating> getProduct2ProductRatingsBySource(Product source);
 
 }

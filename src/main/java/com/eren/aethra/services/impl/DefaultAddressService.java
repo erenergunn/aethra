@@ -46,14 +46,20 @@ public class DefaultAddressService implements AddressService {
     @Override
     public void createAddress(AddressRequest addressRequest) throws Exception {
         Customer customer = sessionService.getCurrentCustomer();
+        Optional<Address> optionalAddress = addressDao.getAddressByCodeAndCustomer(addressRequest.getCode(), customer);
+        if (optionalAddress.isPresent()) {
+            throw new Exception("You already have address with same code: " + addressRequest.getCode());
+        }
         Address address = new Address();
         address.setCustomer(customer);
         if(Objects.nonNull(Objects.nonNull(addressRequest.getAddress()))) {
-            address.setAddress((addressRequest.getAddress()));
             address.setCode(addressRequest.getCode());
+            address.setName(addressRequest.getName());
+            address.setAddress((addressRequest.getAddress()));
         } else {
             throw new Exception("All fields must be filled.");
         }
+        addressDao.save(address);
     }
 
     @Override

@@ -78,13 +78,12 @@ public class DefaultProductService implements ProductService {
             product = new Product();
             product.setCode(dto.getCode());
         }
-        if (StringUtils.isNotBlank(dto.getCategoryCode())) {
-            Category category = categoryService.getCategoryForCode(dto.getCategoryCode());
-            if (category != null) {
-                product.setCategory(category);
-            } else {
-                throw new Exception("Category not found for : " + dto.getCategoryCode());
-            }
+        if (StringUtils.isBlank(dto.getCategoryCode())) {
+            throw new Exception("Category not found for : " + dto.getCategoryCode());
+        }
+        Category category = categoryService.getCategoryForCode(dto.getCategoryCode());
+        if (category != null) {
+            product.setCategory(category);
         } else {
             throw new Exception("Category not found for : " + dto.getCategoryCode());
         }
@@ -110,5 +109,12 @@ public class DefaultProductService implements ProductService {
             product.setIsApproved(dto.getIsApproved());
         }
         productDao.save(product);
+        List<Product> productsInSameCategory = this.getProductModelsForCategory(category);
+        ratingHelper.createOrRecalculateRatingOfP2P(productsInSameCategory, product, 3D, 15);
+    }
+
+    @Override
+    public List<Product> getProductModelsForCategory(Category category) {
+        return productDao.findProductsByCategory(category);
     }
 }

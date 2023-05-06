@@ -26,9 +26,6 @@ public class DefaultUserService implements UserService {
     @Override
     public void updateProfile(CustomerRequest dto) {
         Customer customer = sessionService.getCurrentCustomer();
-        if (dto.getContactMail() != null) {
-            customer.setContactMail(dto.getContactMail());
-        }
         if (dto.getUsername() != null) {
             customer.setUsername(dto.getUsername());
         }

@@ -56,7 +56,7 @@ public class AccountController {
     }
 
     @PostMapping("/create-address")
-    public ResponseEntity createAddress(AddressRequest addressRequest) {
+    public ResponseEntity createAddress(@RequestBody AddressRequest addressRequest) {
         try {
             addressService.createAddress(addressRequest);
             return new ResponseEntity<>(AethraCoreConstants.ADDRESS_ADDED_SUCCESSFULLY, HttpStatus.OK);

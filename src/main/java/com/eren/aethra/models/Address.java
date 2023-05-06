@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = "address")
+@Table(name = "address", uniqueConstraints = {@UniqueConstraint(columnNames = {"code", "customer"})})
 public class Address extends Item {
 
     private String code;

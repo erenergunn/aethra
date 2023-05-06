@@ -7,8 +7,6 @@ public class CustomerRequest {
 
     private String username;
 
-    private String contactMail;
-
     private String firstName;
 
     private String lastName;

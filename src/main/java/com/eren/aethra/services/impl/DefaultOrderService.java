@@ -70,7 +70,6 @@ public class DefaultOrderService implements OrderService {
         Order order = new Order();
         Customer customer = sessionService.getCurrentCustomer();
         Cart cart = sessionService.getCurrentCart();
-        Store store = cart.getCustomer().getStore();
         cartService.validateCart(cart);
 
         order.setEntries(cart.getEntries());
@@ -78,7 +77,7 @@ public class DefaultOrderService implements OrderService {
         order.setCustomer(cart.getCustomer());
         order.setAddress(addressService.findAddressByCode(addressCode));
         order.setTotalPriceOfProducts(cart.getTotalPriceOfProducts());
-        order.setShippingPrice(cart.getTotalPriceOfProducts() > store.getFreeShippingThreshold() ? 0 : order.getShippingPrice());
+        order.setShippingPrice(cart.getTotalPriceOfProducts() > 100 ? 0 : 9.99);
         order.setTotalPrice(order.getTotalPriceOfProducts() + order.getShippingPrice());
         modelDao.save(order);
 
@@ -87,9 +86,11 @@ public class DefaultOrderService implements OrderService {
 
         entries.forEach(entry -> {
             Product product = entry.getProduct();
-            product.setStockValue(product.getStockValue() - entry.getQuantity());
+            int newStock = product.getStockValue() - entry.getQuantity();
+            product.setStockValue(newStock);
+            if (newStock <= 0) {product.setIsApproved(false);}
             modelDao.save(product);
-            ratingHelper.createOrRecalculateRatingOfP2P(products, product, 3D, 10);
+            ratingHelper.createOrRecalculateRatingOfP2P(products, product, 2D, 10);
             ratingHelper.createOrRecalculateRatingOfC2P(customer, product, 4D, 15);
 
         });

@@ -5,10 +5,10 @@ import lombok.Data;
 @Data
 public class AddressRequest {
 
-    private String code;
+    String code;
 
-    private String name;
+    String name;
 
-    private String address;
+    String address;
 
 }
