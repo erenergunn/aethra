@@ -11,6 +11,6 @@ public interface OrderDao extends JpaRepository<Order, Long> {
 
     List<Order> getOrdersByCustomer(Customer customer);
 
-    Optional<Order> getOrderByCode(String code);
+    Optional<Order> getOrderByPk(String pk);
 
 }

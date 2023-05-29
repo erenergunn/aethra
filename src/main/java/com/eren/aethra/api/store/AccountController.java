@@ -66,7 +66,7 @@ public class AccountController {
     }
 
     @GetMapping("/edit-address/{addressCode}")
-    public ResponseEntity editAddress(@PathVariable String addressCode) {
+    public ResponseEntity getAddressForCode(@PathVariable String addressCode) {
         try {
             return new ResponseEntity<>(modelMapper.map(addressService.findAddressByCode(addressCode), AddressResponse.class), HttpStatus.OK);
         } catch (Exception e){

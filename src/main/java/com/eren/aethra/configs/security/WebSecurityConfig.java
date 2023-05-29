@@ -14,6 +14,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.Resource;
 
@@ -31,6 +33,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Resource
     private JwtRequestFilter jwtRequestFilter;
 
+    private final String[] DISABLED_PATHS = {"/register", "/authenticate", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/homepage", "/store", "/c/**", "/p/**"};
+
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
 
@@ -41,6 +45,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                for (String disabledPath : DISABLED_PATHS) {
+                    registry.addMapping(disabledPath);
+                }
+            }
+        };
     }
 
     @Bean
@@ -55,7 +71,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         httpSecurity.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/register","/authenticate","/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/homepage", "/store", "/c/**", "/p/**")
+                .antMatchers(DISABLED_PATHS)
                 .permitAll()
                 .anyRequest()
                 .authenticated()

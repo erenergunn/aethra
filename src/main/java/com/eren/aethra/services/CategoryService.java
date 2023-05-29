@@ -1,5 +1,6 @@
 package com.eren.aethra.services;
 
+import com.eren.aethra.dtos.requests.CategoryListRequest;
 import com.eren.aethra.dtos.requests.CategoryRequest;
 import com.eren.aethra.dtos.responses.CategoryResponse;
 import com.eren.aethra.dtos.responses.ProductListResponse;
@@ -16,5 +17,7 @@ public interface CategoryService {
     Category getCategoryForCode(String code);
 
     void createOrUpdateCategory(CategoryRequest categoryRequest);
+
+    void createOrUpdateCategoryBulk(CategoryListRequest categoryListRequest);
 
 }

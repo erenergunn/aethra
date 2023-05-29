@@ -11,6 +11,7 @@ public class CartResponse {
 
     Double totalPriceOfProducts;
 
-    CustomerResponse customer;
+    Integer numberOfProducts;
+
 
 }

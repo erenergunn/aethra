@@ -8,6 +8,7 @@ import com.eren.aethra.models.Product;
 import com.eren.aethra.models.Product2ProductRating;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -47,7 +48,7 @@ public class RatingHelper {
                     customer2Product.setProduct(rProduct);
                     customer2Product.setCustomer(customer);
                 } else {
-                    double newRating = customer2Product.getRating() + (percentageRate / 20);
+                    double newRating = customer2Product.getRating() + (percentageRate / 20D);
                     customer2Product.setRating(newRating > 10 ? 9.9 : newRating);
                 }
                 c2PDao.save(customer2Product);
@@ -66,7 +67,7 @@ public class RatingHelper {
 
     public List<Product> getRecommendedProductsForCustomer (Customer customer) {
         Set<Customer2ProductRating> c2pRel = c2PDao.findCustomer2ProductRatingsByCustomer(customer);
-        if (c2pRel == null || c2pRel.size() == 0) {
+        if (CollectionUtils.isEmpty(c2pRel)) {
             return null;
         }
 
@@ -86,6 +87,15 @@ public class RatingHelper {
                 .sorted(Comparator.comparing(Customer2ProductRating::getRating))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         return ImmutableSet.copyOf(Iterables.limit(sortedRel, 20)).stream().map(Customer2ProductRating::getProduct).collect(Collectors.toList());
+    }
+
+    public List<Product> getMostPopularProducts() {
+        List<Product2ProductRating> ratings = p2PDao.getMostPopularProducts();
+        return CollectionUtils.isNotEmpty(ratings) ? ratings
+                .stream()
+                .map(Product2ProductRating::getSource)
+                .distinct()
+                .collect(Collectors.toList()) : null;
     }
 
     private void addC2PToSet(Set<Customer2ProductRating> set, Product product, Double c2pRating, Double p2pRating) {

@@ -1,9 +1,10 @@
 package com.eren.aethra.services.impl;
 
 import com.eren.aethra.constants.Exceptions;
-import com.eren.aethra.daos.C2PDao;
 import com.eren.aethra.daos.ProductDao;
+import com.eren.aethra.dtos.requests.ProductListRequest;
 import com.eren.aethra.dtos.requests.ProductRequest;
+import com.eren.aethra.dtos.responses.ProductListResponse;
 import com.eren.aethra.dtos.responses.ProductResponse;
 import com.eren.aethra.helpers.RatingHelper;
 import com.eren.aethra.models.Category;
@@ -39,9 +40,6 @@ public class DefaultProductService implements ProductService {
     private ModelMapper modelMapper;
 
     @Resource
-    private C2PDao c2PDao;
-
-    @Resource
     private RatingHelper ratingHelper;
 
     @Override
@@ -55,17 +53,43 @@ public class DefaultProductService implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> getRecommendedProducts() throws Exception {
+    public ProductListResponse getRecommendedProducts() {
         Customer customer = sessionService.getCurrentCustomer();
-        return ratingHelper.getRecommendedProductsForCustomer(customer)
-                .stream()
-                .map(product -> modelMapper.map(product, ProductResponse.class))
-                .collect(Collectors.toList());
+        if (Objects.nonNull(customer)) {
+            List<Product> recommendedProducts = ratingHelper.getRecommendedProductsForCustomer(customer);
+            List<ProductResponse> productResponses = Objects.nonNull(recommendedProducts) ? recommendedProducts
+                    .stream()
+                    .map(product -> modelMapper.map(product, ProductResponse.class))
+                    .collect(Collectors.toList()) : null;
+            ProductListResponse productListResponse = new ProductListResponse();
+            productListResponse.setProducts(productResponses);
+            return productListResponse;
+        } else {
+            List<Product> products = ratingHelper.getMostPopularProducts();
+            List<ProductResponse> productResponses = Objects.nonNull(products) ? products.subList(0, Math.min(products.size(), 8))
+                    .stream()
+                    .map(product -> modelMapper.map(product, ProductResponse.class))
+                    .collect(Collectors.toList()) : null;
+            ProductListResponse productListResponse = new ProductListResponse();
+            productListResponse.setProducts(productResponses);
+            return productListResponse;
+        }
     }
 
     @Override
     public List<ProductResponse> getBestSellingProducts() {
         return null;
+    }
+
+    @Override
+    public void createOrUpdateProductBulk(ProductListRequest dto) throws Exception {
+        dto.getProducts().forEach(productRequest -> {
+            try {
+                createOrUpdateProduct(productRequest);
+            } catch (Exception e) {
+                // TODO
+            }
+        });
     }
 
     @Override
@@ -79,7 +103,7 @@ public class DefaultProductService implements ProductService {
             product.setCode(dto.getCode());
         }
         if (StringUtils.isBlank(dto.getCategoryCode())) {
-            throw new Exception("Category not found for : " + dto.getCategoryCode());
+            throw new Exception("Category code can not be blank!");
         }
         Category category = categoryService.getCategoryForCode(dto.getCategoryCode());
         if (category != null) {

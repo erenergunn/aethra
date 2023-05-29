@@ -13,10 +13,6 @@ import java.util.Set;
 @Table(name = "orders")
 public class Order extends Item {
 
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(unique = true)
-    private String code;
-
     @OneToMany(fetch = FetchType.EAGER)
     @Nullable
     private Set<Entry> entries;

@@ -4,13 +4,20 @@ import java.io.Serializable;
 
 public class JwtResponse implements Serializable {
 
-    private final String jwttoken;
+    private final String jwtToken;
 
-    public JwtResponse(String jwttoken) {
-        this.jwttoken = jwttoken;
+    private final Long expiresIn;
+
+    public JwtResponse(String jwttoken, Long expiresIn) {
+        this.jwtToken = jwttoken;
+        this.expiresIn = expiresIn;
     }
 
     public String getToken() {
-        return this.jwttoken;
+        return this.jwtToken;
+    }
+
+    public Long getExpiresIn() {
+        return this.expiresIn;
     }
 }

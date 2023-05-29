@@ -53,7 +53,7 @@ public class DefaultOrderService implements OrderService {
     @Override
     public Order findOrderDetailsForCode(String orderCode) throws Exception {
         Customer customer = sessionService.getCurrentCustomer();
-        Optional<Order> optionalOrder = orderDao.getOrderByCode(orderCode);
+        Optional<Order> optionalOrder = orderDao.getOrderByPk(orderCode);
         if(optionalOrder.isPresent()){
             if(optionalOrder.get().getCustomer().equals(customer)){
                 return optionalOrder.get();

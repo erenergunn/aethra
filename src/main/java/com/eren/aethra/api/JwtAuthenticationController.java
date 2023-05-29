@@ -15,6 +15,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @CrossOrigin
 @RestController
@@ -30,15 +32,16 @@ public class JwtAuthenticationController {
     private JwtUserDetailsService userDetailsService;
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
+    public ResponseEntity<JwtResponse> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
 
         try {
             authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
             final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
             final String token = jwtTokenUtil.generateToken(userDetails);
-            return ResponseEntity.ok(new JwtResponse(token));
+            Long expiresIn = (jwtTokenUtil.getExpirationDateFromToken(token).getTime() - new Date().getTime()) / 1000;
+            return ResponseEntity.ok(new JwtResponse(token, expiresIn));
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
     }

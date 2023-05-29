@@ -58,8 +58,11 @@ public class DefaultAddressService implements AddressService {
             address.setAddress((addressRequest.getAddress()));
         } else {
             throw new Exception("All fields must be filled.");
+        } try {
+            addressDao.save(address);
+        } catch (Exception e) {
+            throw new Exception("Error while saving address.");
         }
-        addressDao.save(address);
     }
 
     @Override

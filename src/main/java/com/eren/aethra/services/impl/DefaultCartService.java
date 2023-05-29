@@ -2,6 +2,8 @@ package com.eren.aethra.services.impl;
 
 import com.eren.aethra.constants.Exceptions;
 import com.eren.aethra.daos.ModelDao;
+import com.eren.aethra.dtos.responses.CartResponse;
+import com.eren.aethra.dtos.responses.EntryResponse;
 import com.eren.aethra.helpers.RatingHelper;
 import com.eren.aethra.models.Cart;
 import com.eren.aethra.models.Customer;
@@ -11,6 +13,7 @@ import com.eren.aethra.services.CartService;
 import com.eren.aethra.services.ProductService;
 import com.eren.aethra.services.SessionService;
 import org.apache.commons.collections.CollectionUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -35,21 +38,39 @@ public class DefaultCartService implements CartService {
     @Resource
     private RatingHelper ratingHelper;
 
+    @Resource
+    private ModelMapper modelMapper;
+
     @Override
-    public Cart getCartForCustomer() {
+    public CartResponse getCartForCustomer() {
         Cart cart = sessionService.getCurrentCart();
         validateCart(cart);
-        return cart;
+        CartResponse cartResponse = new CartResponse();
+        Set<EntryResponse> entries = cart.getEntries()
+                .stream()
+                .map(entry -> modelMapper.map(entry, EntryResponse.class))
+                .collect(Collectors.toSet());
+        cartResponse.setEntries(entries);
+        cartResponse.setTotalPriceOfProducts(cart.getTotalPriceOfProducts());
+        cartResponse.setNumberOfProducts(cart.getEntries().size());
+        return cartResponse;
     }
 
     @Override
     public void validateCart(Cart cart) {
-        cart.getEntries().forEach(entry -> {
+        Set<Entry> entries = cart.getEntries();
+        entries.forEach(entry -> {
             if(entry.getProduct().getStockValue() < entry.getQuantity()) {
                 entry.setQuantity(entry.getProduct().getStockValue());
                 modelDao.save(entry);
             }
         });
+        Set<Entry> entriesToRemove = entries
+                .stream()
+                .filter(entry -> entry.getQuantity() == 0)
+                .collect(Collectors.toSet());
+        entries.removeAll(entriesToRemove);
+        cart.setEntries(entries);
         calculateCart(cart);
     }
 

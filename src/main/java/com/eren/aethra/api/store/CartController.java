@@ -23,7 +23,7 @@ public class CartController {
     @GetMapping
     public ResponseEntity getCartForCustomer(){
         try {
-            return new ResponseEntity<>(modelMapper.map(cartService.getCartForCustomer(), CartResponse.class), HttpStatus.OK);
+            return new ResponseEntity<>(cartService.getCartForCustomer(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

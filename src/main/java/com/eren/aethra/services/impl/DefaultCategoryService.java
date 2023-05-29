@@ -3,6 +3,7 @@ package com.eren.aethra.services.impl;
 import com.eren.aethra.constants.Exceptions;
 import com.eren.aethra.daos.CategoryDao;
 import com.eren.aethra.daos.ProductDao;
+import com.eren.aethra.dtos.requests.CategoryListRequest;
 import com.eren.aethra.dtos.requests.CategoryRequest;
 import com.eren.aethra.dtos.responses.CategoryResponse;
 import com.eren.aethra.dtos.responses.ProductListResponse;
@@ -87,6 +88,13 @@ public class DefaultCategoryService implements CategoryService {
         if (StringUtils.isNotBlank(dto.getName())) category.setName(dto.getName());
         if (StringUtils.isNotBlank(dto.getDescription())) category.setDescription(dto.getDescription());
         categoryDao.save(category);
+    }
+
+    @Override
+    public void createOrUpdateCategoryBulk(CategoryListRequest categoryListRequest) {
+        categoryListRequest.getCategories().forEach(categoryRequest -> {
+            createOrUpdateCategory(categoryRequest);
+        });
     }
 
 }
