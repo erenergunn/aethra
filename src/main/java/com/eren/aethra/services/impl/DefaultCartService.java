@@ -44,6 +44,14 @@ public class DefaultCartService implements CartService {
     @Override
     public CartResponse getCartForCustomer() {
         Cart cart = sessionService.getCurrentCart();
+        if (Objects.isNull(cart)) {
+            Customer customer = sessionService.getCurrentCustomer();
+            cart = new Cart();
+            cart.setCustomer(customer);
+            cart.setEntries(Collections.emptySet());
+            cart.setTotalPriceOfProducts(0D);
+            modelDao.save(cart);
+        }
         validateCart(cart);
         CartResponse cartResponse = new CartResponse();
         Set<EntryResponse> entries = cart.getEntries()
@@ -91,23 +99,35 @@ public class DefaultCartService implements CartService {
     public void addProductToCart(String productCode, Integer qty) throws Exception {
         Customer customer = sessionService.getCurrentCustomer();
         Cart cart = sessionService.getCurrentCart();
-        if (cart != null && cart.getEntries().size() > 0
-                && cart.getEntries().stream().anyMatch(entry -> entry.getProduct().getCode().equals(productCode))) {
-            throw new Exception("You already have this product on cart");
+        Entry entry = null;
+        boolean isExist = false;
+        if (cart != null && cart.getEntries().size() > 0) {
+            Optional<Entry> optionalEntry = cart.getEntries().stream().filter(entry1 -> entry1.getProduct().getCode().equals(productCode)).findFirst();
+            if (optionalEntry.isPresent()) {
+                isExist = true;
+                entry = optionalEntry.get();
+                entry.setQuantity(entry.getQuantity() + (qty == null ? 1 : qty));
+            }
         }
-        Entry entry = new Entry();
+        if (entry == null) {
+            entry = new Entry();
+        }
         Product product = productService.findProductByCode(productCode);
         if (qty < product.getStockValue()) {
             if(qty <= 0){
                 throw new Exception(Exceptions.QUANTITY_OF_THE_PRODUCT_CANT_BE_NEGATIVE + productCode);
             }
-            entry.setProduct(product);
-            entry.setQuantity(qty);
+            if (!isExist) {
+                entry.setProduct(product);
+                entry.setQuantity(qty);
+            }
             modelDao.save(entry);
             if(Objects.nonNull(cart)){
-                Set<Entry> entries = CollectionUtils.isNotEmpty(cart.getEntries()) ? cart.getEntries() : new HashSet<>();
-                entries.add(entry);
-                cart.setEntries(entries);
+                if (!isExist) {
+                    Set<Entry> entries = CollectionUtils.isNotEmpty(cart.getEntries()) ? cart.getEntries() : new HashSet<>();
+                    entries.add(entry);
+                    cart.setEntries(entries);
+                }
             } else {
                 cart = new Cart();
                 cart.setEntries(Collections.singleton(entry));

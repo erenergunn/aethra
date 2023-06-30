@@ -8,10 +8,7 @@ import com.eren.aethra.services.CategoryService;
 import com.eren.aethra.services.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -45,6 +42,15 @@ public class ManagementController {
         }
     }
 
+    @PostMapping("/product/delete/{code}")
+    public ResponseEntity createOrUpdateProductBulk(@PathVariable String code) {
+        try {
+            productService.deleteProductForCode(code);
+            return new ResponseEntity("Product removed successfully .", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity("Error while deleting product: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @PostMapping("/category/create-or-update")
     public ResponseEntity createOrUpdateCategory(@RequestBody CategoryRequest categoryRequest) {

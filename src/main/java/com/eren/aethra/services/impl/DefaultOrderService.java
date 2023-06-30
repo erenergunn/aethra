@@ -4,6 +4,9 @@ import com.eren.aethra.constants.Exceptions;
 import com.eren.aethra.daos.CartDao;
 import com.eren.aethra.daos.ModelDao;
 import com.eren.aethra.daos.OrderDao;
+import com.eren.aethra.dtos.responses.EntryResponse;
+import com.eren.aethra.dtos.responses.OrderListResponse;
+import com.eren.aethra.dtos.responses.OrderResponse;
 import com.eren.aethra.enums.OrderStatus;
 import com.eren.aethra.helpers.RatingHelper;
 import com.eren.aethra.models.*;
@@ -11,13 +14,13 @@ import com.eren.aethra.services.AddressService;
 import com.eren.aethra.services.CartService;
 import com.eren.aethra.services.OrderService;
 import com.eren.aethra.services.SessionService;
+import org.apache.commons.collections.CollectionUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,10 +47,34 @@ public class DefaultOrderService implements OrderService {
     @Resource
     private RatingHelper ratingHelper;
 
+    @Resource
+    private ModelMapper modelMapper;
+
     @Override
-    public List<Order> getOrdersForCustomer() {
+    public OrderListResponse getOrdersForCustomer() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy - HH:mm");
         Customer customer = sessionService.getCurrentCustomer();
-        return orderDao.getOrdersByCustomer(customer);
+        List<Order> orders = orderDao.getOrdersByCustomer(customer);
+        List<OrderResponse> orderList = new LinkedList<>();
+        if (CollectionUtils.isNotEmpty(orders)) {
+            for (Order order : orders) {
+                OrderResponse orderResponse = new OrderResponse();
+                orderResponse.setPk(order.getPk().toString());
+                orderResponse.setTotalPrice(order.getTotalPrice());
+                Set<EntryResponse> entries = order.getEntries()
+                        .stream()
+                        .map(entry -> modelMapper.map(entry, EntryResponse.class))
+                        .collect(Collectors.toSet());
+                orderResponse.setEntries(entries);
+                orderResponse.setOrderStatus(getOrderStatusName(order.getOrderStatus()));
+                orderResponse.setCreatedAt(dateFormat.format(order.getCreatedAt()));
+                orderList.add(orderResponse);
+            }
+            OrderListResponse orderListResponse = new OrderListResponse();
+            orderListResponse.setOrders(orderList);
+            return orderListResponse;
+        }
+        return null;
     }
 
     @Override
@@ -66,7 +93,7 @@ public class DefaultOrderService implements OrderService {
     }
 
     @Override
-    public void placeOrder(String addressCode) throws Exception {
+    public void placeOrder() throws Exception {
         Order order = new Order();
         Customer customer = sessionService.getCurrentCustomer();
         Cart cart = sessionService.getCurrentCart();
@@ -75,10 +102,9 @@ public class DefaultOrderService implements OrderService {
         order.setEntries(cart.getEntries());
         order.setOrderStatus(OrderStatus.CREATED);
         order.setCustomer(cart.getCustomer());
-        order.setAddress(addressService.findAddressByCode(addressCode));
         order.setTotalPriceOfProducts(cart.getTotalPriceOfProducts());
-        order.setShippingPrice(cart.getTotalPriceOfProducts() > 100 ? 0 : 9.99);
-        order.setTotalPrice(order.getTotalPriceOfProducts() + order.getShippingPrice());
+        order.setTotalPrice(order.getTotalPriceOfProducts());
+        order.setCreatedAt(new Date());
         modelDao.save(order);
 
         Set<Entry> entries = cart.getEntries();
@@ -98,6 +124,33 @@ public class DefaultOrderService implements OrderService {
         cart.setEntries(Collections.emptySet());
         cart.setTotalPriceOfProducts(0D);
         modelDao.save(cart);
+    }
+
+    private String getOrderStatusName(OrderStatus orderStatus) {
+        switch(orderStatus) {
+            case CREATED:
+                return  "Oluşturuldu";
+            case RECEIVED:
+                return "Alındı";
+            case RETURNED:
+                return "İade Edildi";
+            case SHIPPING:
+                return "Kargoya Verildi";
+            case CANCELLED:
+                return "İptal Edildi";
+            case COMPLETED:
+                return "Tamamlandı";
+            case DELIVERED:
+                return "Teslim Edili";
+            case IN_PREPARATION:
+                return "Hazırlanıyor";
+            case CANCEL_REQUEST_RECEIVED:
+                return "İptal İsteği Alındı";
+            case RETURN_REQUEST_RECEIVED:
+                return "İade İsteği Alındı";
+            default:
+                return "Alındı";
+        }
     }
 
 

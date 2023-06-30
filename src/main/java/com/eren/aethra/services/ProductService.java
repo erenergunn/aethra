@@ -13,14 +13,22 @@ public interface ProductService {
 
     Product findProductByCode(String code) throws Exception;
 
+    ProductListResponse getSimilarProducts(String code) throws Exception;
+
     ProductListResponse getRecommendedProducts();
+
+    ProductListResponse getFavoriteProducts();
 
     List<ProductResponse> getBestSellingProducts();
 
-    public void createOrUpdateProductBulk(ProductListRequest dto) throws Exception;
+    void createOrUpdateProductBulk(ProductListRequest dto) throws Exception;
 
-    public void createOrUpdateProduct(ProductRequest dto) throws Exception;
+    void deleteProductForCode(String code) throws Exception;
+
+    void createOrUpdateProduct(ProductRequest dto) throws Exception;
 
     List<Product> getProductModelsForCategory(Category category);
+
+    void addProductToFavorites(String productCode) throws Exception;
 
 }

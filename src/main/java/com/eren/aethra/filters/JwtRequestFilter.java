@@ -1,6 +1,9 @@
 package com.eren.aethra.filters;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Optional;
 
 import javax.annotation.Resource;
 import javax.servlet.FilterChain;
@@ -9,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.eren.aethra.daos.CartDao;
+import com.eren.aethra.models.Cart;
 import com.eren.aethra.models.Customer;
 import com.eren.aethra.services.SessionService;
 import com.eren.aethra.utils.JwtTokenUtil;
@@ -60,8 +64,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             } catch (Exception e) {
                 System.out.println("Error while setting customer into session service");
             }
-        } else {
-            logger.warn("JWT Token does not begin with Bearer String");
         }
 
 
@@ -81,7 +83,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 try {
                     Customer customer = jwtTokenUtil.getUserFromToken();
                     sessionService.setCurrentCustomer(customer);
-                    sessionService.setCurrentCart(cartDao.findCartByCustomer(customer));
+                    Optional<Cart> cartByCustomer = cartDao.findCartByCustomer(customer);
+                    if (cartByCustomer.isPresent()) {
+                        sessionService.setCurrentCart(cartByCustomer.get());
+                    }
                 } catch (Exception e) {
                     System.out.println("Error while creating session");
                 }

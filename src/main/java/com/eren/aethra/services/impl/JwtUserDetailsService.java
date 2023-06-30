@@ -2,9 +2,11 @@ package com.eren.aethra.services.impl;
 
 import com.eren.aethra.dtos.requests.CustomerRequest;
 import com.eren.aethra.dtos.responses.CustomerResponse;
+import com.eren.aethra.dtos.responses.JwtResponse;
 import com.eren.aethra.models.Customer;
 import com.eren.aethra.services.CustomerService;
 import com.eren.aethra.services.StoreService;
+import com.eren.aethra.utils.JwtTokenUtil;
 import lombok.SneakyThrows;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.User;
@@ -33,6 +35,12 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Resource
     private StoreService storeService;
 
+    @Resource
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Resource
+    private UserDetailsService userDetailsService;
+
     @SneakyThrows
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -42,13 +50,19 @@ public class JwtUserDetailsService implements UserDetailsService {
                 new ArrayList<>());
     }
 
-    public CustomerResponse register(CustomerRequest request) {
+    public JwtResponse register(CustomerRequest request) throws Exception {
+        if (customerService.isCustomerExists(request.getUsername())) {
+            throw new Exception("Bu mail adresi kullanılmaktadır.");
+        }
         Customer customer = modelMapper.map(request, Customer.class);
         customer.setPassword(bcryptEncoder.encode(customer.getPassword()));
         customer.setFavProducts(Collections.emptySet());
         customer.setStore(storeService.getStoreModel());
         customerService.register(customer);
-        return modelMapper.map(customer, CustomerResponse.class);
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(customer.getUsername());
+
+        return new JwtResponse(jwtTokenUtil.generateToken(userDetails), 0L);
     }
 
 }

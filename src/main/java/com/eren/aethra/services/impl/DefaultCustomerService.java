@@ -47,6 +47,11 @@ public class DefaultCustomerService implements CustomerService {
         }
     }
 
+    public Boolean isCustomerExists(String username) {
+        Optional<Customer> customerByUsername = customerDao.getCustomerByUsername(username);
+        return customerByUsername.isPresent();
+    }
+
     @Override
     public Customer getCurrentCustomer() throws Exception {
         return jwtTokenUtil.getUserFromToken();

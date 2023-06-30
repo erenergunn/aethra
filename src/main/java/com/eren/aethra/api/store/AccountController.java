@@ -27,8 +27,8 @@ public class AccountController {
     @Resource
     ModelMapper modelMapper;
 
-    @GetMapping("/edit-profile")
-    public ResponseEntity editAccount() {
+    @GetMapping("/profile")
+    public ResponseEntity profile() {
         try {
             return new ResponseEntity<>(modelMapper.map(customerService.getCurrentCustomer(), CustomerResponse.class), HttpStatus.OK);
         } catch (Exception e) {
@@ -37,7 +37,7 @@ public class AccountController {
     }
 
     @PostMapping("/edit-profile")
-    public ResponseEntity editAccount(@RequestBody CustomerRequest customerDto) {
+    public ResponseEntity editProfile(@RequestBody CustomerRequest customerDto) {
         try {
             customerService.updateCustomer(customerDto);
             return new ResponseEntity<>(AethraCoreConstants.PROFILE_UPDATED_SUCCESSFULLY, HttpStatus.OK);

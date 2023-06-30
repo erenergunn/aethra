@@ -22,8 +22,6 @@ public class Order extends Item {
     @ManyToOne
     private Customer customer;
 
-    private Double shippingPrice;
-
     private Double totalPrice;
 
     private OrderStatus orderStatus;

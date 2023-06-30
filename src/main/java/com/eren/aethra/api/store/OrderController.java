@@ -1,6 +1,7 @@
 package com.eren.aethra.api.store;
 
 import com.eren.aethra.constants.AethraCoreConstants;
+import com.eren.aethra.dtos.responses.OrderListResponse;
 import com.eren.aethra.dtos.responses.OrderResponse;
 import com.eren.aethra.services.OrderService;
 import org.modelmapper.ModelMapper;
@@ -25,8 +26,7 @@ public class OrderController {
     @GetMapping
     public ResponseEntity getOrdersForCustomer() {
         try {
-            List<OrderResponse> orderResponses = orderService.getOrdersForCustomer().stream().map(order -> modelMapper.map(order, OrderResponse.class)).collect(Collectors.toList());
-            return new ResponseEntity<>(orderResponses, HttpStatus.OK);
+            return new ResponseEntity<>(orderService.getOrdersForCustomer(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -42,9 +42,9 @@ public class OrderController {
     }
 
     @PostMapping("/place")
-    public ResponseEntity placeOrder(@RequestParam String addressCode) {
+    public ResponseEntity placeOrder() {
         try {
-            orderService.placeOrder(addressCode);
+            orderService.placeOrder();
             return new ResponseEntity<>(AethraCoreConstants.ORDER_PLACED_SUCCESSFULLY, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

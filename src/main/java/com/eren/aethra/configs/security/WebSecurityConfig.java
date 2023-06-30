@@ -33,7 +33,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Resource
     private JwtRequestFilter jwtRequestFilter;
 
-    private final String[] DISABLED_PATHS = {"/register", "/authenticate", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/homepage", "/store", "/c/**", "/p/**"};
+    private final String[] DISABLED_PATHS = {"/register", "/authenticate", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/homepage", "/store", "/c/**", "/p/**", "/my-account/**"};
+    private final String[] DISABLED_PATHS_CORS = {"/**"};
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -52,7 +53,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                for (String disabledPath : DISABLED_PATHS) {
+                for (String disabledPath : DISABLED_PATHS_CORS) {
                     registry.addMapping(disabledPath);
                 }
             }
@@ -71,7 +72,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         httpSecurity.csrf().disable()
                 .authorizeRequests()
-                .antMatchers(DISABLED_PATHS)
+                .antMatchers(DISABLED_PATHS_CORS)
                 .permitAll()
                 .anyRequest()
                 .authenticated()

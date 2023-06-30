@@ -26,5 +26,7 @@ public class ProductResponse {
 
     String categoryCode;
 
+    String categoryName;
+
     Set<String> keywords;
 }

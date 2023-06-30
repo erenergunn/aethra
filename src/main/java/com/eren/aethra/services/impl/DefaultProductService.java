@@ -1,6 +1,7 @@
 package com.eren.aethra.services.impl;
 
 import com.eren.aethra.constants.Exceptions;
+import com.eren.aethra.daos.ModelDao;
 import com.eren.aethra.daos.ProductDao;
 import com.eren.aethra.dtos.requests.ProductListRequest;
 import com.eren.aethra.dtos.requests.ProductRequest;
@@ -22,6 +23,7 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +31,9 @@ public class DefaultProductService implements ProductService {
 
     @Resource
     private ProductDao productDao;
+
+    @Resource
+    private ModelDao modelDao;
 
     @Resource
     private CategoryService categoryService;
@@ -50,6 +55,16 @@ public class DefaultProductService implements ProductService {
         } else {
             throw new Exception(Exceptions.PRODUCT_NOT_FOUND_CODE + code);
         }
+    }
+
+    @Override
+    public ProductListResponse getSimilarProducts(String code) throws Exception {
+        Product product = this.findProductByCode(code);
+        List<Product> similarProducts = ratingHelper.getSimilarProducts(product);
+        List<ProductResponse> similarProductsResponse = similarProducts.stream().map(product1 -> modelMapper.map(product1, ProductResponse.class)).collect(Collectors.toList());
+        ProductListResponse productListResponse = new ProductListResponse();
+        productListResponse.setProducts(similarProductsResponse);
+        return productListResponse;
     }
 
     @Override
@@ -77,6 +92,18 @@ public class DefaultProductService implements ProductService {
     }
 
     @Override
+    public ProductListResponse getFavoriteProducts() {
+        Customer customer = sessionService.getCurrentCustomer();
+        Set<Product> favProducts = customer.getFavProducts();
+        List<ProductResponse> productResponseList = favProducts.stream()
+                .map(product -> modelMapper.map(product, ProductResponse.class))
+                .collect(Collectors.toList());
+        ProductListResponse productListResponse = new ProductListResponse();
+        productListResponse.setProducts(productResponseList);
+        return productListResponse;
+    }
+
+    @Override
     public List<ProductResponse> getBestSellingProducts() {
         return null;
     }
@@ -91,6 +118,17 @@ public class DefaultProductService implements ProductService {
             }
         });
     }
+
+    @Override
+    public void deleteProductForCode(String code) throws Exception {
+        Optional<Product> optionalProduct = productDao.getProductByCode(code);
+        if (optionalProduct.isPresent()) {
+            productDao.delete(optionalProduct.get());
+        } else {
+            throw new Exception("Product not found for code: " + code);
+        }
+    }
+
 
     @Override
     public void createOrUpdateProduct(ProductRequest dto) throws Exception {
@@ -117,6 +155,9 @@ public class DefaultProductService implements ProductService {
         if (StringUtils.isNotBlank(dto.getDescription())) {
             product.setDescription(dto.getDescription());
         }
+        if (StringUtils.isNotBlank(dto.getPicture())) {
+            product.setPicture(dto.getPicture());
+        }
         if (CollectionUtils.isNotEmpty(dto.getGalleryImages())) {
             product.setGalleryImages(dto.getGalleryImages());
         }
@@ -134,11 +175,20 @@ public class DefaultProductService implements ProductService {
         }
         productDao.save(product);
         List<Product> productsInSameCategory = this.getProductModelsForCategory(category);
-        ratingHelper.createOrRecalculateRatingOfP2P(productsInSameCategory, product, 3D, 15);
+        ratingHelper.createOrRecalculateRatingOfP2P(productsInSameCategory, product, 4D, 15);
     }
 
     @Override
     public List<Product> getProductModelsForCategory(Category category) {
         return productDao.findProductsByCategory(category);
+    }
+
+    @Override
+        public void addProductToFavorites(String productCode) throws Exception {
+        Customer customer = sessionService.getCurrentCustomer();
+        Set<Product> favProducts = customer.getFavProducts();
+        favProducts.add(this.findProductByCode(productCode));
+        customer.setFavProducts(favProducts);
+        modelDao.save(customer);
     }
 }

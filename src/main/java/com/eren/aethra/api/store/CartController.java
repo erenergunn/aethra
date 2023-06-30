@@ -1,9 +1,7 @@
 package com.eren.aethra.api.store;
 
 import com.eren.aethra.constants.AethraCoreConstants;
-import com.eren.aethra.dtos.responses.CartResponse;
 import com.eren.aethra.services.CartService;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +14,6 @@ public class CartController {
 
     @Resource
     private CartService cartService;
-
-    @Resource
-    private ModelMapper modelMapper;
 
     @GetMapping
     public ResponseEntity getCartForCustomer(){

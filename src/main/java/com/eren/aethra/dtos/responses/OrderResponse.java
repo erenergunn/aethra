@@ -4,6 +4,7 @@ import com.eren.aethra.enums.OrderStatus;
 import com.eren.aethra.models.Entry;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.Set;
 
 @Data
@@ -11,18 +12,16 @@ public class OrderResponse {
 
     String pk;
 
-    Set<Entry> entries;
+    Set<EntryResponse> entries;
 
     Double totalPriceOfProducts;
 
-    Double shippingPrice;
-
     Double totalPrice;
 
-    OrderStatus orderStatus;
-
-    AddressResponse address;
+    String orderStatus;
 
     String shippingTrackingLink;
+
+    String createdAt;
 
 }

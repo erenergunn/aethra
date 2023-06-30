@@ -10,6 +10,8 @@ public interface CustomerService {
 
     Customer findCustomerByUsername(String username) throws Exception;
 
+    Boolean isCustomerExists(String username);
+
     Customer getCurrentCustomer() throws Exception;
 
     Customer register(Customer customer);
