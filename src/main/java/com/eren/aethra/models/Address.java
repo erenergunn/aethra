@@ -1,11 +1,8 @@
 package com.eren.aethra.models;
 
-import com.eren.aethra.models.Customer;
-import com.eren.aethra.models.Item;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 import lombok.Data;
-
-import javax.persistence.*;
 
 @Data
 @Entity

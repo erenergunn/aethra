@@ -1,12 +1,12 @@
 package com.eren.aethra.services.impl;
 
 import com.eren.aethra.dtos.requests.CustomerRequest;
-import com.eren.aethra.dtos.responses.CustomerResponse;
 import com.eren.aethra.dtos.responses.JwtResponse;
 import com.eren.aethra.models.Customer;
 import com.eren.aethra.services.CustomerService;
 import com.eren.aethra.services.StoreService;
 import com.eren.aethra.utils.JwtTokenUtil;
+import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.User;
@@ -16,7 +16,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 

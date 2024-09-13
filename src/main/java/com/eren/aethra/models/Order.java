@@ -2,10 +2,10 @@ package com.eren.aethra.models;
 
 
 import com.eren.aethra.enums.OrderStatus;
-import com.sun.istack.Nullable;
+import jakarta.persistence.*;
 import lombok.Data;
 
-import javax.persistence.*;
+import javax.annotation.Nullable;
 import java.util.Set;
 
 @Data

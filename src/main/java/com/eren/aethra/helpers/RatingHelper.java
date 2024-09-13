@@ -4,10 +4,10 @@ import com.eren.aethra.daos.C2PDao;
 import com.eren.aethra.daos.P2PDao;
 import com.eren.aethra.models.*;
 import com.eren.aethra.services.SessionService;
-import org.apache.commons.collections.CollectionUtils;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
-import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,25 +34,6 @@ public class RatingHelper {
             c2p.setRating(calculateNewRating(minRating, percentageRate, c2p.getRating()));
         }
         c2PDao.save(c2p);
-
-//        List<Product2ProductRating> p2pList = p2PDao.getProduct2ProductRatingsBySource(product);
-//        if (p2pList != null && p2pList.size() > 0) {
-//            p2pList.forEach(p2p -> {
-//                Product rProduct = p2p.getTarget();
-//                Customer2ProductRating customer2Product = c2PDao.findCustomer2ProductRatingsByCustomerAndAndProduct(customer, rProduct);
-//                if (customer2Product == null) {
-//                    customer2Product = new Customer2ProductRating();
-//                    double newRating = (minRating / 6) + (p2p.getRating() / 3D);
-//                    customer2Product.setRating(newRating > 10 ? 9.9 : newRating);
-//                    customer2Product.setProduct(rProduct);
-//                    customer2Product.setCustomer(customer);
-//                } else {
-//                    double newRating = customer2Product.getRating() + (percentageRate / 18D);
-//                    customer2Product.setRating(newRating > 10 ? 9.9 : newRating);
-//                }
-//                c2PDao.save(customer2Product);
-//            });
-//        }
     }
 
     public void createOrRecalculateRatingOfP2P(List<Product> products, Product product, Double minRating, Integer percentageRate) {
@@ -87,9 +68,12 @@ public class RatingHelper {
             addC2PToSet(productRatings, c2p.getProduct(), c2p.getRating(), c2p.getRating());
         }
         Cart currentCart = sessionService.getCurrentCart();
+        Set<Entry> entries = currentCart.getEntries();
+        boolean isSizeOfEntriesGreater = Objects.nonNull(entries) && entries.size() >= 20;
         Map<Product, Double> sortedMap = sortByValue(productRatings);
+        int lastIndex = Math.min(isSizeOfEntriesGreater ? entries.size() + 12 : 20, sortedMap.size());
         List<Product> products = new ArrayList<>(sortedMap.keySet())
-                .subList(0, Math.min(currentCart.getEntries().size() >= 20 ? currentCart.getEntries().size() + 12 : 20, sortedMap.size()));
+                .subList(0, lastIndex);
 
         if (products.size() < 6) {
             List<Product> mostPopularProducts = getMostPopularProducts();
@@ -101,8 +85,8 @@ public class RatingHelper {
         }
 
         List<String> productCodesInCart = Collections.emptyList();
-        if (CollectionUtils.isNotEmpty(currentCart.getEntries())) {
-            productCodesInCart = currentCart.getEntries().stream().map(Entry::getProduct).map(Product::getCode).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(entries)) {
+            productCodesInCart = entries.stream().map(Entry::getProduct).map(Product::getCode).collect(Collectors.toList());
         }
         List<String> finalProductCodesInCart = productCodesInCart;
         List<Product> productsWithoutInCarts = products.stream().filter(product -> !finalProductCodesInCart.contains(product.getCode())).collect(Collectors.toList());
@@ -123,7 +107,7 @@ public class RatingHelper {
 
     public List<Product> getMostPopularProducts() {
         List<Product2ProductRating> ratings = p2PDao.getMostPopularProducts();
-        return CollectionUtils.isNotEmpty(ratings) ? ratings
+        return !CollectionUtils.isEmpty(ratings) ? ratings
                 .stream()
                 .map(Product2ProductRating::getSource)
                 .distinct()

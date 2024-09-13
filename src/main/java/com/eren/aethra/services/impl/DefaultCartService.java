@@ -12,11 +12,11 @@ import com.eren.aethra.models.Product;
 import com.eren.aethra.services.CartService;
 import com.eren.aethra.services.ProductService;
 import com.eren.aethra.services.SessionService;
-import org.apache.commons.collections.CollectionUtils;
+import org.springframework.util.CollectionUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -124,7 +124,7 @@ public class DefaultCartService implements CartService {
             modelDao.save(entry);
             if(Objects.nonNull(cart)){
                 if (!isExist) {
-                    Set<Entry> entries = CollectionUtils.isNotEmpty(cart.getEntries()) ? cart.getEntries() : new HashSet<>();
+                    Set<Entry> entries = !CollectionUtils.isEmpty(cart.getEntries()) ? cart.getEntries() : new HashSet<>();
                     entries.add(entry);
                     cart.setEntries(entries);
                 }

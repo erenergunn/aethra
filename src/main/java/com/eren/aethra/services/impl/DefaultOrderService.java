@@ -1,7 +1,6 @@
 package com.eren.aethra.services.impl;
 
 import com.eren.aethra.constants.Exceptions;
-import com.eren.aethra.daos.CartDao;
 import com.eren.aethra.daos.ModelDao;
 import com.eren.aethra.daos.OrderDao;
 import com.eren.aethra.dtos.responses.EntryResponse;
@@ -10,15 +9,15 @@ import com.eren.aethra.dtos.responses.OrderResponse;
 import com.eren.aethra.enums.OrderStatus;
 import com.eren.aethra.helpers.RatingHelper;
 import com.eren.aethra.models.*;
-import com.eren.aethra.services.AddressService;
 import com.eren.aethra.services.CartService;
 import com.eren.aethra.services.OrderService;
 import com.eren.aethra.services.SessionService;
-import org.apache.commons.collections.CollectionUtils;
+import jakarta.annotation.Resource;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
-import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,13 +32,7 @@ public class DefaultOrderService implements OrderService {
     private ModelDao modelDao;
 
     @Resource
-    private CartDao cartDao;
-
-    @Resource
     private SessionService sessionService;
-
-    @Resource
-    private AddressService addressService;
 
     @Resource
     private CartService cartService;
@@ -56,11 +49,12 @@ public class DefaultOrderService implements OrderService {
         Customer customer = sessionService.getCurrentCustomer();
         List<Order> orders = orderDao.getOrdersByCustomer(customer);
         List<OrderResponse> orderList = new LinkedList<>();
-        if (CollectionUtils.isNotEmpty(orders)) {
+        if (!CollectionUtils.isEmpty(orders)) {
             for (Order order : orders) {
                 OrderResponse orderResponse = new OrderResponse();
                 orderResponse.setPk(order.getPk().toString());
                 orderResponse.setTotalPrice(order.getTotalPrice());
+                Assert.notNull(order.getEntries(), "Entries are required");
                 Set<EntryResponse> entries = order.getEntries()
                         .stream()
                         .map(entry -> modelMapper.map(entry, EntryResponse.class))
@@ -80,7 +74,7 @@ public class DefaultOrderService implements OrderService {
     @Override
     public Order findOrderDetailsForCode(String orderCode) throws Exception {
         Customer customer = sessionService.getCurrentCustomer();
-        Optional<Order> optionalOrder = orderDao.getOrderByPk(orderCode);
+        Optional<Order> optionalOrder = orderDao.getOrderByPk(Long.valueOf(orderCode));
         if(optionalOrder.isPresent()){
             if(optionalOrder.get().getCustomer().equals(customer)){
                 return optionalOrder.get();
@@ -93,7 +87,7 @@ public class DefaultOrderService implements OrderService {
     }
 
     @Override
-    public void placeOrder() throws Exception {
+    public void placeOrder() {
         Order order = new Order();
         Customer customer = sessionService.getCurrentCustomer();
         Cart cart = sessionService.getCurrentCart();
@@ -108,6 +102,7 @@ public class DefaultOrderService implements OrderService {
         modelDao.save(order);
 
         Set<Entry> entries = cart.getEntries();
+        Assert.notNull(entries, "Entries are required");
         List<Product> products = entries.stream().map(Entry::getProduct).collect(Collectors.toList());
 
         entries.forEach(entry -> {
@@ -127,30 +122,19 @@ public class DefaultOrderService implements OrderService {
     }
 
     private String getOrderStatusName(OrderStatus orderStatus) {
-        switch(orderStatus) {
-            case CREATED:
-                return  "Oluşturuldu";
-            case RECEIVED:
-                return "Alındı";
-            case RETURNED:
-                return "İade Edildi";
-            case SHIPPING:
-                return "Kargoya Verildi";
-            case CANCELLED:
-                return "İptal Edildi";
-            case COMPLETED:
-                return "Tamamlandı";
-            case DELIVERED:
-                return "Teslim Edili";
-            case IN_PREPARATION:
-                return "Hazırlanıyor";
-            case CANCEL_REQUEST_RECEIVED:
-                return "İptal İsteği Alındı";
-            case RETURN_REQUEST_RECEIVED:
-                return "İade İsteği Alındı";
-            default:
-                return "Alındı";
-        }
+        return switch (orderStatus) {
+            case CREATED -> "Oluşturuldu";
+            case RECEIVED -> "Alındı";
+            case RETURNED -> "İade Edildi";
+            case SHIPPING -> "Kargoya Verildi";
+            case CANCELLED -> "İptal Edildi";
+            case COMPLETED -> "Tamamlandı";
+            case DELIVERED -> "Teslim Edili";
+            case IN_PREPARATION -> "Hazırlanıyor";
+            case CANCEL_REQUEST_RECEIVED -> "İptal İsteği Alındı";
+            case RETURN_REQUEST_RECEIVED -> "İade İsteği Alındı";
+            default -> "Alındı";
+        };
     }
 
 

@@ -9,7 +9,7 @@ import com.eren.aethra.services.AddressService;
 import com.eren.aethra.services.SessionService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Objects;
 import java.util.Optional;
 

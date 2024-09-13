@@ -6,15 +6,15 @@ import com.eren.aethra.dtos.requests.ProductListRequest;
 import com.eren.aethra.dtos.requests.ProductRequest;
 import com.eren.aethra.services.CategoryService;
 import com.eren.aethra.services.ProductService;
+import jakarta.annotation.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-
 @RestController
 @RequestMapping("/admin")
-public class ManagementController {
+public class
+ManagementController {
 
     @Resource
     private ProductService productService;

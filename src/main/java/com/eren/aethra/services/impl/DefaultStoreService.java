@@ -9,7 +9,7 @@ import com.eren.aethra.services.StoreService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 @Service
 public class DefaultStoreService implements StoreService {

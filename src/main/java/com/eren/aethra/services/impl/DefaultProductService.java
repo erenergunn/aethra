@@ -14,12 +14,12 @@ import com.eren.aethra.models.Product;
 import com.eren.aethra.services.CategoryService;
 import com.eren.aethra.services.ProductService;
 import com.eren.aethra.services.SessionService;
-import org.apache.commons.collections.CollectionUtils;
+import org.springframework.util.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -158,10 +158,10 @@ public class DefaultProductService implements ProductService {
         if (StringUtils.isNotBlank(dto.getPicture())) {
             product.setPicture(dto.getPicture());
         }
-        if (CollectionUtils.isNotEmpty(dto.getGalleryImages())) {
+        if (!CollectionUtils.isEmpty(dto.getGalleryImages())) {
             product.setGalleryImages(dto.getGalleryImages());
         }
-        if (CollectionUtils.isNotEmpty(dto.getKeywords())) {
+        if (!CollectionUtils.isEmpty(dto.getKeywords())) {
             product.setKeywords(dto.getKeywords());
         }
         if (Objects.nonNull(dto.getStockValue())) {

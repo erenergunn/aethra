@@ -7,7 +7,7 @@ import com.eren.aethra.services.SessionService;
 import com.eren.aethra.services.UserService;
 import org.modelmapper.ModelMapper;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 public class DefaultUserService implements UserService {
 

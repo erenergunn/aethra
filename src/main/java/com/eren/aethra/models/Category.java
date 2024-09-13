@@ -1,11 +1,10 @@
 package com.eren.aethra.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Data;
 
-import javax.persistence.*;
-import java.util.List;
 
 @Data
 @Entity
